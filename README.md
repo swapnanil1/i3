@@ -1,4 +1,4 @@
-# Arch Linux + SwayWM
+# Arch Linux + i3wm
 
 # Usage
 
