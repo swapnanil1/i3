@@ -4,7 +4,7 @@ set $mod Mod4
 #Fonts
 font JetBrainsMono Nerd Font 13
 
-# Wallpapers | first run "feh --bg-scale path/to/wallpaper.jpg" to generate .fehbg file on ~/
+# Wallpapers
 exec_always --no-startup-id ~/.fehbg &
 
 # Setup Display And RefreshRate | Make it executable
@@ -12,16 +12,26 @@ exec --no-startup-id ~/.config/i3/scripts/set-resolution-refresh.sh
 
 # Polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh 
+
 # Autostart
+exec_always systemctl --user import-environment DISPLAY
+exec_always systemctl --user import-environment CM_LAUNCHER=rofi
 exec --no-startup-id dex --autostart --environment i3
 exec_always --no-startup-id /usr/bin/lxqt-policykit-agent &
 exec_always --no-startup-id autotiling
-#exec_always --no-startup-id swaync              # Notification
-#exec wl-paste --watch cliphist store            # Clipboard
+exec_always --no-startup-id clipmenud
 exec_always --no-startup-id dunst 
 exec --no-startup-id corectrl
 exec --no-startup-id /usr/bin/keepassxc
 exec --no-startup-id /usr/bin/flameshot
+
+# Custom Binds
+bindsym $mod+d exec --no-startup-id rofi -show drun
+bindsym $mod+Return exec alacritty
+bindsym $mod+c exec firefox
+bindsym $mod+e exec nemo
+bindsym $mod+Shift+p exec "flameshot gui"
+bindsym $mod+p exec clipmenu
 
 
 # Window Decorations
@@ -73,14 +83,8 @@ floating_modifier $mod
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
-# start a terminal
-bindsym $mod+Return exec alacritty
-
 # kill focused window
 bindsym $mod+Shift+q kill
-
-# start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id rofi -show drun
 
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
@@ -124,7 +128,7 @@ bindsym $mod+f fullscreen toggle
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
-bindsym $mod+e layout toggle split
+bindsym $mod+x layout toggle split
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
