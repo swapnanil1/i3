@@ -31,7 +31,7 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+c exec firefox
 bindsym $mod+e exec nemo
 bindsym $mod+Shift+p exec "flameshot gui"
-bindsym $mod+p exec clipmenu
+bindsym $mod+p exec "CM_LAUNCHER=rofi clipmenu"
 
 
 # Window Decorations
