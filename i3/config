@@ -4,8 +4,8 @@ set $mod Mod4
 #Fonts
 font JetBrainsMono Nerd Font 13
 
-# Wallpapers
-exec_always --no-startup-id ~/.fehbg &
+# Wallpapers | feh --bg-scale /path/to/image.file
+exec_always --no-startup-id sleep 2 && nitrogen --restore
 
 # Setup Display And RefreshRate | Make it executable
 exec --no-startup-id ~/.config/i3/scripts/set-resolution-refresh.sh
@@ -26,7 +26,7 @@ exec --no-startup-id /usr/bin/keepassxc
 exec --no-startup-id /usr/bin/flameshot
 
 # Custom Binds
-bindsym $mod+d exec --no-startup-id rofi -show drun
+bindsym $mod+d exec rofi -show drun -theme arc-dark.rasi -font "JetBrainsMono Nerd Font 13" -show combi -icon-theme "Colloid-Teal-Dark" -show-icons
 bindsym $mod+Return exec alacritty
 bindsym $mod+c exec firefox
 bindsym $mod+e exec nemo
