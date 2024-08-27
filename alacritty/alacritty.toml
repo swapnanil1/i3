@@ -1,52 +1,156 @@
-#import = ["~/.config/alacritty/themes/themes/midnight-haze.toml"]
-#import = ["~/.config/alacritty/themes/themes/omni.toml"]
-#Window decoration only works with a compositor(WM), remove if on windows
-[window]
-opacity = 0.9
-dynamic_padding = true
-decorations = "None"
-blur = true
+## Configuration for Alacritty, the GPU enhanced terminal emulator.
+## It's a very basic and simple config file, for full configuration, Run `man 5 alacritty`
+
+## GENERAL --------------------------------------------------------
+
+## Import additional configuration files.
+import = ["~/.config/i3/alacritty/colors.toml", "~/.config/i3/alacritty/fonts.toml"]
 
 [font]
-size = 13.0
+## Font size in points.
+size = 13
 
+## When true, Alacritty will use a custom built-in font for box drawing characters and powerline symbols.
+builtin_box_drawing = true
+
+## Normal font family.
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+
+## If the family is not specified, it will fall back to the value specified for the normal font.
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+
+## If the family is not specified, it will fall back to the value specified for the normal font.
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+
+## If the family is not specified, it will fall back to the value specified for the normal font.
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+
+## Offset is the extra space around each character.
+## 'y' can be thought of as modifying the line spacing, and 'x' as modifying the letter spacing.
 [font.offset]
 x = 0
 y = 0
 
+## Glyph offset determines the locations of the glyphs within their cells with the default being at the bottom.
+## Increasing 'x' moves the glyph to the right, increasing 'y' moves the glyph upward.
 [font.glyph_offset]
 x = 0
 y = 0
 
-[font.normal]
-family = "JetBrainsMono Nerd Font"
-style = "Regular"
 
-[font.italic]
-family = "JetBrainsMono Nerd Font"
-style = "Italic"
+[colors.primary]
+background = "#1e222a"
+foreground = "#c8ccd4"
 
-[font.bold]
-family = "JetBrainsMono Nerd Font"
-style = "Bold"
+[colors.normal]
+black   = "#1e222a"
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#e5c07b"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+white   = "#abb2bf"
 
-[font.bold_italic]
-family = "JetBrainsMono Nerd Font"
-style = "Bold Italic"
+[colors.bright]
+black   = "#545862"
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#e5c07b"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+white   = "#c8ccd4"
 
+## You can set shell.program to the path of your favorite shell, e.g. /bin/zsh.
+## Entries in shell.args are passed as arguments to the shell.
+#shell = { program = "/bin/zsh", args = ["--login"] }
+
+## Directory the shell is started in. When this is unset, or "None",
+## the working directory of the parent process will be used.
+#working_directory = "None"
+
+## ENVIRONMENT ----------------------------------------------------
+
+## All key-value pairs in the [env] section will be added as environment variables for any process spawned
+## by Alacritty, including its shell. Some entries may override variables set by alacritty itself.
+[env]
+TERM = "alacritty"
+WINIT_X11_SCALE_FACTOR = "1.0"
+
+## WINDOW ---------------------------------------------------------
+[window]
+position = "None"
+dynamic_padding = true
+decorations = "full"
+opacity = 0.9
+blur = true
+dynamic_title = true
+class = { instance = "Alacritty", general = "Alacritty" }
+decorations_theme_variant = "None"
+
+## Number of lines/columns (not pixels) in the terminal.
 [window.dimensions]
-columns = 80
+columns = 82
 lines = 24
 
+## Blank space added around the window in pixels.
 [window.padding]
 x = 10
 y = 10
 
+## SCROLLING ------------------------------------------------------
+[scrolling]
+history = 10000
+multiplier = 3
+
+## BELL -----------------------------------------------------------
+[bell]
+animation = "Linear"
+duration = 20
+command = { program = "paplay", args = ["/usr/share/sounds/freedesktop/stereo/dialog-error.oga"] }
+
+## SELECTION ------------------------------------------------------
 [selection]
 save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
+## CURSOR ---------------------------------------------------------
+[cursor]
+vi_mode_style = "None"
+blink_interval = 750
+blink_timeout = 5
+unfocused_hollow = false
+thickness = 0.15
+
+[cursor.style]
+shape = "Block"
+blinking = "On"
+
+## MOUSE ----------------------------------------------------------
+[mouse]
+hide_when_typing = false
+
+## HINTS ----------------------------------------------------------
 [[hints.enabled]]
-regex = "[^ ]+\\.rs:\\d+:\\d+"
-command = { program = "code", args = [ "--goto" ] }
-mouse = { enabled = true }
+command         = "xdg-open"
+hyperlinks      = true
+post_processing = true
+persist         = false
+mouse.enabled   = true
+binding         = { key = "U", mods = "Control|Shift" }
+regex           = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩‘]+"
+
+## DEBUG ----------------------------------------------------------
+[debug]
+render_timer = false
+persistent_logging = false
+log_level = "Warn"
+renderer = "None"
+print_events = false
+highlight_damage = false
+prefer_egl = false

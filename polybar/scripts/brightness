@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Get the current brightness level using ddcutil
+brightness=$(ddcutil getvcp 10 | awk '{print $9}' | tr -d ,)
+
+# Output the brightness level and icon
+echo "${brightness}%"

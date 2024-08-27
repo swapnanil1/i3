@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Define the brightness increment/decrement value
+BRIGHTNESS_STEP=10
+
+# Get the current brightness level
+CURRENT_BRIGHTNESS=$(ddcutil getvcp 10 | awk '{print $9}' | tr -d ,)
+
+# Output the current brightness level
+echo "${CURRENT_BRIGHTNESS}%"
+
+# Listen for input from Polybar
+while IFS= read -r line; do
+  case "$line" in
+    "increase")
+      # Increase brightness by $BRIGHTNESS_STEP
+      ddcutil setvcp 10 + $BRIGHTNESS_STEP
+      ;;
+    "decrease")
+      # Decrease brightness by $BRIGHTNESS_STEP
+      ddcutil setvcp 10 - $BRIGHTNESS_STEP
+      ;;
+  esac
+done

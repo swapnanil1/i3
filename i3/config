@@ -1,80 +1,42 @@
-# Mod Key
-set $mod Mod4
+##-- Include Config Files ---------------------
+include ~/.config/i3/config.d/*.conf
+set $mod Mod1
 
-#Fonts
-font JetBrainsMono Nerd Font 13
-
-# Wallpapers | feh --bg-scale /path/to/image.file
-exec_always --no-startup-id sleep 2 && nitrogen --restore
-
-# Setup Display And RefreshRate | Make it executable
-exec --no-startup-id ~/.config/i3/scripts/set-resolution-refresh.sh
-
-# Polybar
-exec_always --no-startup-id ~/.config/polybar/launch.sh 
-
-# Autostart
+## -- Autostart
 exec_always systemctl --user import-environment DISPLAY
-exec_always systemctl --user import-environment CM_LAUNCHER=rofi
-exec --no-startup-id dex --autostart --environment i3
-exec_always --no-startup-id /usr/bin/lxqt-policykit-agent &
-exec_always --no-startup-id autotiling
+exec_always --no-startup-id dex --autostart --environment i3
+exec_always --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec_always --no-startup-id nm-applet
+exec_always --no-startup-id /usr/bin/lxpolkit &
+exec_always --no-startup-id dunst
 exec_always --no-startup-id clipmenud
-exec_always --no-startup-id dunst 
-exec --no-startup-id corectrl
+exec_always --no-startup-id autotiling
+exec_always --no-startup-id "hsetroot -cover ~/Pictures/Wallpapers/current.jpg"
+exec_always --no-startup-id ~/.config/i3/scripts/i3_bar
+exec_always --no-startup-id ~/.config/i3/scripts/i3_comp
+exec_always --no-startup-id ~/.config/i3/scripts/set-res
+exec_always --no-startup-id xfce4-power-manager &
 exec --no-startup-id /usr/bin/keepassxc
-exec --no-startup-id /usr/bin/flameshot
+exec --no-startup-id corectrl
 
-# Custom Binds
-bindsym $mod+d exec rofi -show drun -theme arc-dark.rasi -font "JetBrainsMono Nerd Font 13" -show combi -icon-theme "Colloid-Teal-Dark" -show-icons
-bindsym $mod+Return exec alacritty
-bindsym $mod+c exec firefox
+## -- Keymaps
+set $rofi rofi -theme ~/.config/rofi/theme.rasi
+bindsym $mod+d exec $rofi -show drun
 bindsym $mod+e exec nemo
-bindsym $mod+Shift+p exec "flameshot gui"
-bindsym $mod+p exec "CM_LAUNCHER=rofi clipmenu"
+bindsym $mod+c exec firefox
+bindsym $mod+p exec CM_LAUNCHER=rofi clipmenu
+bindsym $mod+Page_Up exec ~/.config/i3/scripts/set-bright up
+bindsym $mod+Page_Down exec ~/.config/i3/scripts/set-bright down
 
 
-# Window Decorations
-gaps outer -2
-gaps inner 2
-gaps top 2
-gaps bottom 0
-hide_edge_borders smart
-
-# Hide Window Title Names
-for_window [class="^.*"] border pixel 0
-
-
-# moutainsButBlue
-# class                 border  bground text    indicator child_border
-client.focused          #50BFB4 #50BFB4 #F8F8F2 #50BFB4   #50BFB4
-client.focused_inactive #026873 #026873 #F8F8F2 #026873   #026873
-client.unfocused        #0D0D0D #0D0D0D #BFBFBF #0D0D0D   #0D0D0D
-client.urgent           #44475A #FF5555 #F8F8F2 #FF5555   #FF5555
-client.placeholder      #180A19 #180A19 #F8F8F2 #180A19   #180A19
-client.background       #F8F8F2
-
-# Inhibit swaylock from locking when anything is fullscreen
-# seat seat0 xcursor_theme PolarCursorTheme-Blue 30
-
-# The combination of xss-lock, nm-applet and pactl is a popular choice, so
-# they are included here as an example. Modify as you see fit.
-
-# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
-# screen before suspend. Use loginctl lock-session to lock your screen.
-#exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-
-
-# NetworkManager is the most popular way to manage wireless networks on Linux,
-# and nm-applet is a desktop environment-independent system tray GUI for it.
-exec --no-startup-id nm-applet
+## -- Fonts
+font pango:JetBrainsMono Nerd Font 13
 
 # Use pactl to adjust volume in PulseAudio.
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -83,11 +45,15 @@ floating_modifier $mod
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
+# start a terminal
+bindsym $mod+Return exec alacritty
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
+# start dmenu (a program launcher)
+# bindsym $mod+d exec --no-startup-id dmenu_run
 # A more modern dmenu replacement is rofi:
-# bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
 # .desktop file. It is a wrapper around dmenu, so you need that installed.
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
@@ -128,7 +94,7 @@ bindsym $mod+f fullscreen toggle
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
-bindsym $mod+x layout toggle split
+bindsym $mod+z layout toggle split
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -184,7 +150,7 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+x exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -212,6 +178,3 @@ mode "resize" {
 }
 
 bindsym $mod+r mode "resize"
-
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
