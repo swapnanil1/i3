@@ -40,6 +40,7 @@ sudo chsh -s /usr/bin/fish swapnanil
 ```
 ### Setup Brighness using ddcutil
 ```
+sudo su
 sudo pacman -S ddcutil
 sudo echo "i2c-dev" >> /etc/modules-load.d/i2c-dev.conf
 sudo usermod swapnanil -aG i2c
