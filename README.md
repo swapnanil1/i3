@@ -42,7 +42,7 @@ sudo chsh -s /usr/bin/fish swapnanil
 ```
 sudo su
 sudo pacman -S ddcutil
-sudo echo "i2c-dev" >> /etc/modules-load.d/i2c-dev.conf
+echo "i2c-dev" | sudo tee -a /etc/modules-load.d/i2c-dev.conf
 sudo usermod swapnanil -aG i2c
 ```
 ### Required For Icons, Screenshare & Authentication
