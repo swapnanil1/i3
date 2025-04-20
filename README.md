@@ -20,12 +20,7 @@
 ### Install i3 + loginmanager + Polkit + brightness control
 
 ```
-sudo pacman -S rofi alacritty dunst picom polybar clipmenu hsetroot xorg-xrandr lxsession-gtk3  
-```
-### Theme And Prompt
-```
-sudo pacman -S fish lxappearance papirus-icon-theme kvantum qt5ct
-sudo chsh -s /usr/bin/fish swapnanil
+sudo pacman -S i3 i3lock xorg-server xorg-xinit xorg-server-utils rofi alacritty dunst picom polybar clipmenu hsetroot xorg-xrandr lxsession-gtk3  
 ```
 ### Disable Mouse Acc
 /etc/X11/xorg.conf.d/40-libinput.conf
@@ -58,14 +53,19 @@ sudo pacman -S ttf-font-awesome ttf-jetbrains-mono-nerd xdg-desktop-portal xdg-u
 Recommended
 
 ```
-sudo pacman -S --needed nemo nemo-audio-tab nemo-emblems nemo-fileroller nemo-image-converter nemo-preview nemo-python gvfs gvfs-mtp xed xreader ristretto 
+sudo pacman -S --needed nwg-look thunar gvfs gvfs-mtp xreader ristretto mousepad
 ```
 
-Set Nemo's Default Terminal
+Set Thunar's Default Terminal
 
 ```
-gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
+xdg-mime default alacritty.desktop x-scheme-handler/terminal
 
+```
+
+Set Chromium as default browser
+```
+xdg-settings set default-web-browser chromium.desktop
 ```
 
 Optional Extras
@@ -89,14 +89,11 @@ paru -S bluetuith
 ### Set Theme for gtk and qt
 
 #### GTK - Theme , Defaults to DarkMode
-
+Use nwg-look for applying gtk theme
 ```
 mkdir .themes
 cd .themes
 git clone https://github.com/EliverLara/Kripton
-gsettings set org.gnome.desktop.interface gtk-theme "Kripton"
-gsettings set org.gnome.desktop.wm.preferences theme "Kripton"
-gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 ```
 
 #### GTK - Icons
@@ -105,8 +102,7 @@ gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 cd repos
 git clone https://github.com/vinceliuice/Colloid-icon-theme.git
 cd Colloid-icon-theme
-./install.sh -s default -t teal
-gsettings set org.gnome.desktop.interface icon-theme "Colloid-Teal-Dark"
+./install.sh -s default -t all
 ```
 
 #### QT
