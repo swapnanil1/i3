@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here (Alacritty)</name>
+	<submenu></submenu>
+	<unique-id>1744925961634352-1</unique-id>
+	<command>alacritty --working-directory %f</command>
+	<description>Open the current folder in Alacritty</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+</actions>
