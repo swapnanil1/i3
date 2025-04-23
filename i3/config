@@ -18,11 +18,12 @@ exec_always --no-startup-id ~/.config/i3/scripts/set-res
 exec_always --no-startup-id xfce4-power-manager &
 exec --no-startup-id /usr/bin/keepassxc
 exec --no-startup-id corectrl
+exec --no-startup-id nitrogen --restore &
 
 ## -- Keymaps
 set $rofi rofi -theme ~/.config/rofi/theme.rasi
 bindsym $mod+d exec $rofi -show drun
-bindsym $mod+e exec nemo
+bindsym $mod+e exec thunar
 bindsym $mod+c exec firefox
 bindsym $mod+p exec CM_LAUNCHER=rofi clipmenu
 bindsym $mod+Page_Up exec ~/.config/i3/scripts/set-bright up
