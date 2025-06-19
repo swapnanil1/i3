@@ -1,18 +1,18 @@
 [global]
 monitor = 0
 follow = mouse
-width = 300
-height = 80
+width = 600
+height = 120
 origin = top-right
 offset = 10x48
 corner_radius = 0
 scale = 0
 notification_limit = 0
 progress_bar = true
-progress_bar_height = 80
+progress_bar_height = 120
 progress_bar_frame_width = 2
-progress_bar_min_width = 300
-progress_bar_max_width = 300
+progress_bar_min_width = 400
+progress_bar_max_width = 400
 indicate_hidden = yes
 transparency = 0
 separator_height = 2
@@ -67,4 +67,3 @@ timeout = 0
 background = "#1e222a"
 foreground = "#e06c75"
 frame_color = "#e06c75"
-
