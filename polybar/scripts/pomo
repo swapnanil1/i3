@@ -1,4 +1,24 @@
 #!/bin/bash
+# Pomodoro for polybar: 25 minutes of work, 5 minutes of break, repeating.
+#
+#   pomo                 bar loop (tail module): prints the countdown every second
+#   pomo toggle          start, or pause/resume           (left click, Alt+Shift+Z)
+#   pomo stop            stop and reset                   (right click)
+#   pomo break           take a break right now           (middle click)
+#   pomo skip            end the break now                (Ctrl+Alt+Shift+B)
+#   pomo stats           the last 7 days, as a notification (scroll on the timer)
+#
+# A minute before a break a notification warns you; when the break starts,
+# i3/scripts/break-screen takes over the screen until it ends. In game mode the
+# break is only announced, never enforced.
+#
+# Only finished blocks are counted: a full 25 minutes of work (pausing and
+# resuming is fine) and a full 5 minute break. Stopping or skipping midway
+# counts nothing. One line per day, kept forever, in plain text:
+#   ~/.local/state/pomo/history     2026-09-19 work=4 breaks=3
+#
+# After a scheduled break the next work session starts by itself. After a break
+# you asked for (middle click) the timer stops and waits for a left click.
 
 # State lives in the per-user runtime dir (mode 0700), not in /tmp where any
 # local user could plant or symlink these files.
@@ -8,6 +28,10 @@ STATE_FILE="$STATE_DIR/state"
 END_TIME_FILE="$STATE_DIR/end_time"
 PAUSED_TIME_FILE="$STATE_DIR/paused_time"
 LOOP_PID_FILE="$STATE_DIR/loop_pid"
+MANUAL_BREAK_FILE="$STATE_DIR/manual_break"
+
+# Survives reboots and is not part of the dotfiles
+HISTORY_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/pomo/history"
 
 # Bash arithmetic evaluates its operands, so file contents go through this first
 read_int() { local v=; [[ -r $1 ]] && v=$(<"$1"); [[ $v =~ ^[0-9]+$ ]] && echo "$v" || echo 0; }
@@ -28,11 +52,44 @@ ICON_PAUSED="󰏤"
 ICON_BREAK="󰅶"
 ICON_STOPPED="󰔛"
 
+# today_count work|breaks  ->  number for today (0 if none)
+today_count() {
+    local line; line=$(grep -s "^$(date +%F) " "$HISTORY_FILE" | tail -n1)
+    [[ $line =~ $1=([0-9]+) ]] && echo "${BASH_REMATCH[1]}" || echo 0
+}
+# count work|breaks  ->  add one to today's line
+count() {
+    local today work breaks; today=$(date +%F)
+    work=$(today_count work); breaks=$(today_count breaks)
+    [[ $1 == work ]] && work=$((work + 1)) || breaks=$((breaks + 1))
+    mkdir -p "$(dirname "$HISTORY_FILE")"
+    { grep -sv "^$today " "$HISTORY_FILE"; echo "$today work=$work breaks=$breaks"; } > "$HISTORY_FILE.tmp" &&
+        mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+}
+# "4w 3b 1h40" for today, empty before the first finished block
+today_summary() {
+    local work breaks mins; work=$(today_count work); breaks=$(today_count breaks)
+    (( work + breaks == 0 )) && return
+    mins=$((work * POMO_DURATION_MIN))
+    printf ' %%{F%s}%dw %db %dh%02d%%{F-}' "$COLOR_STOPPED" "$work" "$breaks" $((mins / 60)) $((mins % 60))
+}
+action_stats() {
+    local body
+    body=$(tail -n 7 "$HISTORY_FILE" 2>/dev/null | while read -r day w b; do
+        w=${w#work=}; b=${b#breaks=}
+        printf '%s   %2d work  %2d breaks  %dh%02d\n' "$day" "$w" "$b" $((w * POMO_DURATION_MIN / 60)) $((w * POMO_DURATION_MIN % 60))
+    done)
+    notify-send -t 10000 "Pomodoro, last 7 days" "${body:-nothing finished yet}"
+}
+
 get_state() { if [[ -s $STATE_FILE ]]; then echo "$(<"$STATE_FILE")"; else echo "stopped"; fi; }
 set_state() { echo "$1" > "$STATE_FILE"; }
 format_time() { local s=$1; ((s<0)) && s=0; printf "%02d:%02d" $((s/60)) $((s%60)); }
 play_sound() {
     [ -f "$SOUND_FILE_PATH" ] || return
+    # same switches as i3/scripts/sound: off, or game mode
+    grep -qsx "enabled=off" "${XDG_STATE_HOME:-$HOME/.local/state}/i3/sound" && return
+    [ -e "${XDG_RUNTIME_DIR:-$HOME/.cache}/gamemode" ] && return
     # pw-play ships with pipewire; mpv is only a fallback
     if command -v pw-play >/dev/null; then
         pw-play "$SOUND_FILE_PATH" &>/dev/null &
@@ -43,6 +100,7 @@ play_sound() {
 send_notification() { notify-send "$1" "$2" -i "$3" -u "$4" -t 5000; }
 
 action_start_pomo() {
+    rm -f "$MANUAL_BREAK_FILE"
     echo $(( $EPOCHSECONDS + POMO_DURATION_MIN * 60 )) > "$END_TIME_FILE"
     rm -f "$PAUSED_TIME_FILE"
     set_state "running"
@@ -52,9 +110,22 @@ action_start_break() {
     rm -f "$PAUSED_TIME_FILE"
     set_state "break_running"
 }
+# A scheduled break rolls into the next work session; a requested one stops.
+action_end_break() {
+    if [ -e "$MANUAL_BREAK_FILE" ]; then
+        action_stop
+    else
+        action_start_pomo
+    fi
+}
+action_take_break() {
+    action_start_break
+    touch "$MANUAL_BREAK_FILE"
+    [ -e "${XDG_RUNTIME_DIR:-$HOME/.cache}/gamemode" ] || setsid -f ~/.config/i3/scripts/break-screen start >/dev/null 2>&1
+}
 action_stop() {
     set_state "stopped"
-    rm -f "$END_TIME_FILE" "$PAUSED_TIME_FILE"
+    rm -f "$END_TIME_FILE" "$PAUSED_TIME_FILE" "$MANUAL_BREAK_FILE"
 }
 
 action_toggle_pause() {
@@ -96,9 +167,17 @@ action_display() {
         running)
             local end_time=$(read_int "$END_TIME_FILE"); local remaining=$((end_time - current_time))
             if (( remaining <= 0 )); then
-                send_notification "Pomodoro Finished!" "Time for a ${BREAK_DURATION_MIN} min break." "clock-symbolic" "critical"
-                play_sound; action_start_break;
+                count work
+                play_sound; action_start_break
+                if [ -e "${XDG_RUNTIME_DIR:-$HOME/.cache}/gamemode" ]; then
+                    send_notification "Pomodoro finished" "Break time: ${BREAK_DURATION_MIN} minutes." "clock-symbolic" "critical"
+                else
+                    setsid -f ~/.config/i3/scripts/break-screen start >/dev/null 2>&1
+                fi
             else
+                if (( remaining == 60 )); then
+                    send_notification "Break in 1 minute" "Wrap up what you are doing." "clock-symbolic" "normal"
+                fi
                 color="$COLOR_RUNNING"; icon="$ICON_RUNNING"; text="$(format_time "$remaining")"
             fi;;
         paused)
@@ -107,8 +186,13 @@ action_display() {
         break_running)
             local end_time=$(read_int "$END_TIME_FILE"); local remaining=$((end_time - current_time))
             if (( remaining <= 0 )); then
-                send_notification "Break Over!" "Time for a ${POMO_DURATION_MIN} min work session." "appointment-soon-symbolic" "normal"
-                play_sound; action_start_pomo;
+                if [ -e "$MANUAL_BREAK_FILE" ]; then
+                    send_notification "Break over" "Left click the timer to start working." "appointment-soon-symbolic" "normal"
+                else
+                    send_notification "Break over" "${POMO_DURATION_MIN} minutes of work, starting now." "appointment-soon-symbolic" "normal"
+                fi
+                count breaks
+                play_sound; action_end_break
             else
                 color="$COLOR_BREAK"; icon="$ICON_BREAK"; text="$(format_time "$remaining")"
             fi;;
@@ -116,10 +200,12 @@ action_display() {
             local remaining=$(read_int "$PAUSED_TIME_FILE")
             color="$COLOR_PAUSED"; icon="$ICON_BREAK"; text="$(format_time "$remaining")";;
         stopped|*)
-            color="$COLOR_STOPPED"; icon="$ICON_STOPPED"; text="Start";;
+            color="$COLOR_STOPPED"; icon="$ICON_STOPPED"; text="";;
     esac
     
-    echo "%{F$color}$icon $text%{F-}"
+    # the icon is wider than one cell and draws into the space after it; without
+    # that space (idle, no text) it sits against the right edge of the pill
+    echo "%{F$color}$icon ${text}%{F-}$(today_summary)"
 }
 
 if [[ -n "$1" ]]; then
@@ -128,6 +214,9 @@ if [[ -n "$1" ]]; then
         toggle)     if [[ "$(get_state)" == "stopped" ]]; then action_start_pomo; else action_toggle_pause; fi;;
         toggle_pause) action_toggle_pause;;
         stop)       action_stop;;
+        break)      action_take_break;;
+        stats)      action_stats; exit 0;;
+        skip)       case "$(get_state)" in break_running|break_paused) action_end_break;; esac;;
     esac
     # wake the bar loop so the change shows immediately
     pid=$(read_int "$LOOP_PID_FILE"); ((pid > 1)) && kill -USR1 "$pid" 2>/dev/null
