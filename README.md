@@ -48,7 +48,7 @@ edits made under `~/.config/i3`, `polybar`, … are edits to the repo.
 | Screenshot (select, annotate) | Print or Alt+Shift+P | flameshot |
 | Screenshot (full screen to `~/Pictures/Screenshots`) | Shift+Print | flameshot |
 | Brightness up / down | Alt+PageUp / Alt+PageDown | ddcutil |
-| Toggle pomodoro | Alt+Shift+Z | polybar `pomo.sh` |
+| Toggle pomodoro | Alt+Shift+Z | polybar `pomo` script |
 | System monitor | Alt+Shift+Escape | btop |
 | Lock | Alt+Shift+X | i3lock |
 | Power menu | Alt+Shift+E | rofi |
@@ -69,6 +69,7 @@ module to left (start), middle (stop) and right (pause) click.
 | `xorg/` | Snippets installed to `/etc/X11/xorg.conf.d/` |
 | `seeds/` | Files copied once and then left to their tool (nwg-look, qt6ct, kvantum, portals) |
 | `packages/` | Package lists, one name per line |
+| `themes/` | Colour palettes and the templates they fill |
 
 ### Session
 
@@ -112,6 +113,31 @@ both values are at the top of `session-start`.
   `~/Pictures/wallpaper.*`). Without one the background is the theme colour.
 * Colours live in `i3/config.d/01_theme.conf`, `polybar/colors.ini`,
   `rofi/shared/colors.rasi` and `dunst/dunstrc`.
+
+### Colour themes
+
+`Alt+Shift+T` opens a picker; `~/.config/i3/scripts/theme <name>` applies one
+directly. It recolours i3, polybar, rofi, alacritty, dunst, the lock screen and
+the bar scripts. GTK and Qt apps are not touched.
+
+| Path | Purpose |
+| --- | --- |
+| `themes/palettes/*.conf` | One palette per file, 15 named colours as `KEY=#rrggbb` |
+| `themes/templates/` | One colour file per tool with `${KEY}` placeholders |
+| `themes/targets.conf` | Which template is written where, and how that tool reloads |
+
+* New theme: copy a palette, change the colours.
+* New tool: add a template, add a line to `targets.conf`, make the tool's
+  config import the generated file.
+
+The generated files are git-ignored; switching themes never changes the repo.
+
+### Checks
+
+```
+make check       # script syntax, shellcheck if installed, palettes and templates, systemd units, installer dry run
+make packages    # every listed package exists in the repos
+```
 
 ### Defaults
 
