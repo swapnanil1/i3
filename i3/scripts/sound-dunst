@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# dunst runs this for every notification: <appname> <summary> <body> <icon> <urgency>
+# Scripts that play their own event sound send notifications as "i3-quiet".
+[[ $1 == i3-quiet ]] && exit 0
+case "$5" in
+	CRITICAL) exec ~/.config/i3/scripts/sound notify-critical ;;
+	NORMAL)   exec ~/.config/i3/scripts/sound notify ;;
+esac    # LOW stays silent

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Event sounds for the desktop, from a freedesktop sound theme.
+#
+#   sound <event>            play it (silent when sounds are off or in game mode)
+#   sound --wait <event>     same, but return only when it has finished playing
+#   sound on | off | toggle | status
+#   sound volume-keys on | off      the blip on volume keys has its own switch
+#
+# Events: notify notify-critical screenshot login logout gamemode-on gamemode-off
+#         theme device-added device-removed volume error pomodoro
+#
+# Settings are per machine, in ~/.local/state/i3/sound (not part of the dotfiles).
+
+THEMES=(ocean freedesktop)     # first theme that has the event wins
+LEVEL=0.6                      # 0.0 - 1.0, relative to the system volume
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/i3/sound"
+RUN="${XDG_RUNTIME_DIR:-$HOME/.cache}"
+
+setting() { sed -n "s/^$1=//p" "$STATE" 2>/dev/null | tail -n1; }
+save() {
+	mkdir -p "$(dirname "$STATE")"
+	{ grep -v "^$1=" "$STATE" 2>/dev/null; echo "$1=$2"; } >"$STATE.tmp" && mv "$STATE.tmp" "$STATE"
+}
+
+case "$1" in
+	on | off) save enabled "$1"; [[ $1 == on ]] && "$0" theme; exit ;;
+	toggle) [[ $(setting enabled) == off ]] && exec "$0" on || exec "$0" off ;;
+	status) echo "sounds: $(setting enabled | grep . || echo on)   volume keys: $(setting volume_keys | grep . || echo off)"; exit ;;
+	volume-keys) [[ $2 == on || $2 == off ]] && save volume_keys "$2"; exit ;;
+esac
+
+wait_for_it=0
+[[ $1 == --wait ]] && { wait_for_it=1; shift; }
+
+[[ $(setting enabled) == off ]] && exit 0
+[[ -e $RUN/gamemode && $1 != gamemode-off ]] && exit 0
+
+case "$1" in
+	notify)          event=message-new-instant ;;
+	notify-critical) event=dialog-warning ;;
+	screenshot)      event=screen-capture ;;
+	login)           event=desktop-login ;;
+	logout)          event=desktop-logout ;;
+	gamemode-on)     event=service-login ;;
+	gamemode-off)    event=service-logout ;;
+	theme)           event=outcome-success ;;
+	device-added)    event=device-added ;;
+	device-removed)  event=device-removed ;;
+	error)           event=dialog-error ;;
+	pomodoro)        event=alarm-clock-elapsed ;;
+	volume)
+		[[ $(setting volume_keys) == on ]] || exit 0
+		# a held key repeats ~30 times a second; one blip per 120 ms is plenty
+		now=$(date +%s%N); last=$(cat "$RUN/sound-volume" 2>/dev/null)
+		[[ $last =~ ^[0-9]+$ ]] && ((now - last < 120000000)) && exit 0
+		echo "$now" >"$RUN/sound-volume"
+		event=audio-volume-change
+		;;
+	*) echo "unknown event: $1" >&2; exit 2 ;;
+esac
+
+for theme in "${THEMES[@]}"; do
+	file=/usr/share/sounds/$theme/stereo/$event.oga
+	[[ -f $file ]] || continue
+	if ((wait_for_it)); then
+		timeout 3 pw-play --volume "$LEVEL" "$file" >/dev/null 2>&1
+	else
+		setsid -f pw-play --volume "$LEVEL" "$file" >/dev/null 2>&1
+	fi
+	exit 0
+done
