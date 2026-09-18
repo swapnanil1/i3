@@ -1,0 +1,9 @@
+/* ${THEME_HEADER} */
+* {
+    background:     ${BG};
+    background-alt: ${BG_ALT};
+    foreground:     ${FG};
+    selected:       ${ACCENT};
+    active:         ${GREEN};
+    urgent:         ${RED};
+}

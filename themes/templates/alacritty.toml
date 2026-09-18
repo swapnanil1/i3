@@ -1,0 +1,48 @@
+# ${THEME_HEADER}
+[colors.primary]
+background = '${BG}'
+foreground = '${FG}'
+
+[colors.cursor]
+text = '${BG}'
+cursor = '${FG}'
+
+[colors.vi_mode_cursor]
+text = '${BG}'
+cursor = '${FG}'
+
+[colors.search]
+matches = { foreground = '${BG}', background = '${ORANGE}' }
+focused_match = { foreground = '${BG}', background = '${BLUE}' }
+
+[colors.hints]
+start = { foreground = '${BG}', background = '${YELLOW}' }
+end = { foreground = '${BG}', background = '${WHITE}' }
+
+[colors.selection]
+text = '${FG}'
+background = '${SELECTION}'
+
+[colors.normal]
+black =   '${BG}'
+red =     '${RED}'
+green =   '${GREEN}'
+yellow =  '${YELLOW}'
+blue =    '${BLUE}'
+magenta = '${MAGENTA}'
+cyan =    '${CYAN}'
+white =   '${WHITE}'
+
+[colors.bright]
+# dim text: must stay readable on the background, so not ${BLACK}
+black =   '${FG_DIM}'
+red =     '${RED}'
+green =   '${GREEN}'
+yellow =  '${YELLOW}'
+blue =    '${BLUE}'
+magenta = '${MAGENTA}'
+cyan =    '${CYAN}'
+white =   '${FG}'
+
+[bell]
+color = '${FG}'
