@@ -2,7 +2,7 @@
 
 /*****----- Configuration -----*****/
 configuration {
-	modi:                       "drun,window";
+	modi:                       "drun,window,keys:~/.config/i3/scripts/rofi-keys";
     show-icons:                 true;
     icon-theme:                 "Papirus-Dark";
     matching:                   "fuzzy";
@@ -13,6 +13,7 @@ configuration {
     display-run:                " Run";
     display-filebrowser:        " Files";
     display-window:             " Windows";
+    display-keys:               " Keys";
 	drun-display-format:        "{name}";
 	window-format:              "{c} · {t}";
 }
@@ -54,7 +55,7 @@ window {
     location:                    center;
     anchor:                      center;
     fullscreen:                  false;
-    width:                       520px;
+    width:                       600px;
     x-offset:                    0px;
     y-offset:                    0px;
 
