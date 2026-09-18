@@ -107,7 +107,7 @@ doctor() {
 	check "PipeWire PulseAudio server reachable"  sh -c "pactl info | grep -q PipeWire"
 	check "i3-session.target installed"           test -e "$CONFIG/systemd/user/i3-session.target"
 	check "polkit agent binary present"           test -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1
-	check "login manager enabled"                 systemctl is-enabled ly@tty2.service
+	check "a login manager is enabled"            sh -c "systemctl is-enabled display-manager.service || systemctl is-enabled ly@tty2.service"
 	check "~/.xprofile loads the session env"     grep -q 'i3/xprofile' "$HOME/.xprofile"
 	if ((fails)); then
 		warn "$fails check(s) failed. Audio and DDC checks need a logged-in session; re-run './install.sh --doctor' after the first login."
@@ -160,7 +160,8 @@ else
 	info "NetworkManager not active: skipping network-manager-applet"
 fi
 
-pacman_args=(-S --needed)
+# -Syu, not -S: installing without upgrading the rest is a partial upgrade
+pacman_args=(-Syu --needed)
 ((YES)) && pacman_args+=(--noconfirm)
 info "${#pkgs[@]} packages from ${#lists[@]} lists"
 run sudo pacman "${pacman_args[@]}" "${pkgs[@]}"
@@ -171,6 +172,7 @@ step "Config symlinks"
 for dir in i3 polybar picom rofi dunst alacritty fish Thunar; do
 	link "$dir" "$CONFIG/$dir"
 done
+link autostart/picom.desktop "$CONFIG/autostart/picom.desktop"
 for unit in "$REPO"/systemd/user/*; do
 	link "systemd/user/$(basename "$unit")" "$CONFIG/systemd/user/$(basename "$unit")"
 done
@@ -193,14 +195,6 @@ fi
 run xdg-user-dirs-update
 run mkdir -p "$HOME/Pictures/Screenshots"
 
-# GTK4/libadwaita apps, Firefox and Electron read dark mode through the portal,
-# which reads gsettings. nwg-look keeps these in sync afterwards.
-if command -v gsettings >/dev/null || ((DRY_RUN)); then
-	run gsettings set org.gnome.desktop.interface color-scheme prefer-dark || warn "gsettings failed (no session bus?); set the theme once with nwg-look after login"
-	run gsettings set org.gnome.desktop.interface gtk-theme Kripton || true
-	run gsettings set org.gnome.desktop.interface icon-theme Colloid-dark || true
-fi
-
 if ((DRY_RUN)) || systemctl --user daemon-reload 2>/dev/null; then
 	run systemctl --user enable gnome-keyring-daemon.socket || warn "could not enable gnome-keyring-daemon.socket"
 else
@@ -211,6 +205,11 @@ fi
 
 if ((THEMES)); then
 	step "GTK theme and icons"
+	# GTK4/libadwaita apps, Firefox and Electron read dark mode through the portal,
+	# which reads gsettings. nwg-look keeps these in sync afterwards.
+	run gsettings set org.gnome.desktop.interface color-scheme prefer-dark || warn "gsettings failed (no session bus?); set the theme once with nwg-look after login"
+	run gsettings set org.gnome.desktop.interface gtk-theme Kripton || true
+	run gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark || true
 	if [[ -d $HOME/.themes/Kripton ]]; then
 		info "ok      ~/.themes/Kripton"
 	else
@@ -258,5 +257,5 @@ fi
 ((DRY_RUN)) || doctor
 
 step "Done"
-info "Reboot, pick i3 in ly and log in."
+info "Reboot (or log out), pick the i3 session at the login screen and log in."
 info "Wallpaper: drop an image at ~/.config/i3/wallpaper.png (or ~/Pictures/wallpaper.*)."

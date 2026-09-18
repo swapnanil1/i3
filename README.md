@@ -25,7 +25,7 @@ units.
 | `--dry-run` | Print what would happen, touch nothing |
 | `--yes` | Pass `--noconfirm` to pacman |
 | `--optional` | Also install `packages/optional.txt` (gammastep, mousepad, catfish, mpv, CJK fonts, numlockx) |
-| `--no-themes` | Skip cloning the Kripton GTK theme and Colloid icons |
+| `--no-themes` | Leave theming alone: no Kripton/Colloid clone, no gsettings changes |
 | `--fish` | Make fish the login shell |
 | `--doctor` | Only run the health checks |
 

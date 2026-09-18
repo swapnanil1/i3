@@ -39,5 +39,6 @@ xdg-desktop-portal-gtk
 xdg-user-dirs
 xdg-utils
 
-# Login manager
+# Login manager (xorg-xauth: ly cannot start an X session without it)
 ly
+xorg-xauth
