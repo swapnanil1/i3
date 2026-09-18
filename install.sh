@@ -193,6 +193,13 @@ for unit in "$REPO"/systemd/user/*; do
 	link "systemd/user/$(basename "$unit")" "$CONFIG/systemd/user/$(basename "$unit")"
 done
 
+step "Colour theme"
+if [[ -f $REPO/i3/theme.env ]]; then
+	info "ok      $(grep -m1 ^THEME= "$REPO/i3/theme.env")"
+else
+	run "$REPO/i3/scripts/theme" --no-reload onedark
+fi
+
 step "Seed files (copied once, then owned by their tools)"
 seeddir Thunar "$CONFIG/Thunar"
 seeddir fish   "$CONFIG/fish"
