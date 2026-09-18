@@ -12,7 +12,7 @@ options=(
 choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Power" -l "${#options[@]}")
 
 case "$choice" in
-	*Lock)     loginctl lock-session ;;
+	*Lock)     ~/.config/i3/scripts/lock-now ;;
 	*Logout)   systemctl --user stop i3-session.target; i3-msg exit ;;
 	*Suspend)  systemctl suspend ;;
 	*Reboot)   systemctl reboot ;;
