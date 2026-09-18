@@ -191,8 +191,10 @@ both values are at the top of `i3/scripts/idle`.
 * **Refresh rate**: `i3/scripts/display` finds each connected output and sets
   its native mode at the highest rate; no output name is hardcoded.
 * **GPU**: on `amdgpu`, `xorg/20-amdgpu.conf` enables TearFree and FreeSync
-  through `xf86-video-amdgpu`. picom uses the `glx` backend with vsync and
-  unredirects fullscreen windows, which is what lets FreeSync engage in games.
+  through `xf86-video-amdgpu`. FreeSync needs a fullscreen window that is not
+  composited; it does not need a compositor. picom (`glx` backend, vsync)
+  steps aside for fullscreen windows so it does not block FreeSync, and game
+  mode stops it altogether.
 * **Brightness**: DDC/CI through `ddcutil`. The value is cached in
   `$XDG_RUNTIME_DIR/brightness`, so the bar never polls the monitor.
 * **Mouse**: `xorg/40-libinput.conf` sets the flat acceleration profile. Remove
