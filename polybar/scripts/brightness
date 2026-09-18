@@ -3,7 +3,7 @@
 # polybar module. The value is cached so the bar never polls the I2C bus, and
 # rapid key/scroll events collapse into a single hardware write.
 #
-#   brightness.sh get | up | down | set <0-100> | menu | toggle
+#   brightness get | up | down | set <0-100> | menu | toggle
 
 STEP=5
 NIGHT=30   # "toggle" flips between this and whatever was set before

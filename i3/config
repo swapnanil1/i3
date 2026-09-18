@@ -14,4 +14,4 @@ exec --no-startup-id ~/.config/i3/scripts/session-start
 # Idempotent, so safe to re-run on every restart
 exec_always --no-startup-id ~/.config/i3/scripts/display
 exec_always --no-startup-id ~/.config/i3/scripts/wallpaper
-exec_always --no-startup-id ~/.config/i3/scripts/i3_bar
+exec_always --no-startup-id ~/.config/i3/scripts/bar

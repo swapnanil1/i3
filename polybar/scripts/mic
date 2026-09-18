@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Microphone mute state for the bar. Event driven (pactl subscribe), no polling.
-#   mic.sh            print state now and on every source change (tail module)
-#   mic.sh toggle     mute/unmute the default source
+#   mic            print state now and on every source change (tail module)
+#   mic toggle     mute/unmute the default source
 
 # Palette written by ~/.config/i3/scripts/theme
 [ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
