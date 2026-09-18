@@ -1,0 +1,27 @@
+# File manager and friends
+thunar
+thunar-volman
+thunar-archive-plugin
+tumbler
+ffmpegthumbnailer
+gvfs
+gvfs-mtp
+xarchiver
+unzip
+zip
+7zip
+ristretto
+xreader
+
+# Theming: nwg-look for GTK, qt6ct + kvantum for Qt
+nwg-look
+qt6ct
+kvantum
+
+# Everyday
+firefox
+pavucontrol
+fish
+eza
+neovim
+git

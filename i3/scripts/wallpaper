@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Uses ~/.config/i3/wallpaper.{png,jpg,jpeg,webp} or ~/Pictures/wallpaper.* if
+# one exists, otherwise paints the theme background colour.
+
+for img in ~/.config/i3/wallpaper.{png,jpg,jpeg,webp} ~/Pictures/wallpaper.{png,jpg,jpeg,webp}; do
+	if [[ -f $img ]]; then
+		exec feh --no-fehbg --bg-fill "$img"
+	fi
+done
+
+exec xsetroot -solid '#1e222a'

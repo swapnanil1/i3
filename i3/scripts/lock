@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Locker for xss-lock. exec keeps the sleep-lock fd that xss-lock hands over.
+exec i3lock --nofork --color 1e222a --show-failed-attempts "$@"

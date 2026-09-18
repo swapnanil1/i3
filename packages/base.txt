@@ -1,0 +1,43 @@
+# What a bare Arch server install is missing for any X11 desktop.
+
+# Xorg
+xorg-server
+xorg-xrandr
+xorg-xset
+xorg-xsetroot
+xorg-xprop
+xorg-xinput
+
+# AMD graphics (xf86-video-amdgpu provides TearFree + FreeSync on Xorg)
+mesa
+vulkan-radeon
+xf86-video-amdgpu
+linux-firmware-amdgpu
+amd-ucode
+
+# Audio
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+rtkit
+libpulse
+
+# Fonts
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+
+# Desktop plumbing: privilege prompts, mounting, secrets, portals, user dirs
+polkit
+mate-polkit
+udisks2
+gnome-keyring
+libsecret
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+xdg-user-dirs
+xdg-utils
+
+# Login manager
+ly

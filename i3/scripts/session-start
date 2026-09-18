@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Runs once per login from the i3 config.
+
+LOCK_AFTER=600   # seconds idle before the screen locks
+OFF_AFTER=900    # seconds idle before the monitor powers down
+
+# Let systemd user units and D-Bus activated services see the X session
+dbus-update-activation-environment --systemd \
+	DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE \
+	QT_QPA_PLATFORMTHEME GTK_THEME 2>/dev/null
+
+# xss-lock fires the locker when the X screensaver kicks in
+xset s "$LOCK_AFTER" 0
+xset dpms 0 0 "$OFF_AFTER"
+
+mkdir -p ~/Pictures/Screenshots
+
+# Clear anything left over from a previous X session that died uncleanly
+systemctl --user stop i3-session.target 2>/dev/null
+systemctl --user reset-failed 2>/dev/null
+systemctl --user start i3-session.target

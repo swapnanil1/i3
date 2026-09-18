@@ -1,0 +1,2 @@
+/* Default theme, so callers can run plain `rofi -show drun` / `rofi -dmenu` */
+@theme "~/.config/rofi/theme.rasi"

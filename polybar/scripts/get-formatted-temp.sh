@@ -28,7 +28,7 @@ get_temp() {
 }
 
 # --- SENSOR DATA ---
-sensors_data=$(sensors)
+sensors_data=$(sensors 2>/dev/null)
 
 # --- LOGIC ---
 if [[ "$1" == "cpu" ]]; then
@@ -50,11 +50,17 @@ else
     exit 1
 fi
 
-# Determine color based on thresholds
+# No sensor found (driver not loaded, different hardware)
+if [[ "$temp" == "N/A" ]]; then
+    echo "%{F$COLOR_NORMAL}N/A%{F-}"
+    exit 0
+fi
+
+# Determine color based on thresholds (get_temp already rounded to an integer)
 color="$COLOR_NORMAL"
-if (( $(echo "$temp >= $crit_thresh" | bc -l) )); then
+if (( temp >= crit_thresh )); then
     color="$COLOR_CRIT"
-elif (( $(echo "$temp >= $warn_thresh" | bc -l) )); then
+elif (( temp >= warn_thresh )); then
     color="$COLOR_WARN"
 fi
 

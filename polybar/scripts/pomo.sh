@@ -20,7 +20,15 @@ ICON_STOPPED=""
 get_state() { cat "$STATE_FILE" 2>/dev/null || echo "stopped"; }
 set_state() { echo "$1" > "$STATE_FILE"; }
 format_time() { local s=$1; ((s<0)) && s=0; printf "%02d:%02d" $((s/60)) $((s%60)); }
-play_sound() { [ -f "$SOUND_FILE_PATH" ] && mpv --no-video --really-quiet "$SOUND_FILE_PATH" &>/dev/null & }
+play_sound() {
+    [ -f "$SOUND_FILE_PATH" ] || return
+    # pw-play ships with pipewire; mpv is only a fallback
+    if command -v pw-play >/dev/null; then
+        pw-play "$SOUND_FILE_PATH" &>/dev/null &
+    elif command -v mpv >/dev/null; then
+        mpv --no-video --really-quiet "$SOUND_FILE_PATH" &>/dev/null &
+    fi
+}
 send_notification() { notify-send "$1" "$2" -i "$3" -u "$4" -t 5000; }
 
 action_start_pomo() {
@@ -108,6 +116,7 @@ action_display() {
 if [[ -n "$1" ]]; then
     case "$1" in
         start)      action_start_pomo;;
+        toggle)     if [[ "$(get_state)" == "stopped" ]]; then action_start_pomo; else action_toggle_pause; fi;;
         toggle_pause) action_toggle_pause;;
         stop)       action_stop;;
     esac

@@ -1,38 +1,51 @@
-include ~/.config/i3/config.d/*.conf
 set $mod Mod1
+include ~/.config/i3/config.d/*.conf
 
-exec_always systemctl --user import-environment DISPLAY
-exec_always --no-startup-id dex --autostart --environment i3
-exec_always --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-exec_always --no-startup-id /usr/bin/lxpolkit &
-exec_always --no-startup-id dunst
-exec_always --no-startup-id clipmenud
-exec_always --no-startup-id autotiling
+# Session: imports the X environment into systemd and starts i3-session.target,
+# which owns the daemons (picom, polkit agent, xss-lock, clipmenud, autotiling,
+# flameshot, dunst) and XDG autostart. Runs once, not on restart.
+exec --no-startup-id ~/.config/i3/scripts/session-start
+
+# Idempotent, so safe to re-run on every restart
+exec_always --no-startup-id ~/.config/i3/scripts/display
+exec_always --no-startup-id ~/.config/i3/scripts/wallpaper
 exec_always --no-startup-id ~/.config/i3/scripts/i3_bar
-exec_always --no-startup-id ~/.config/i3/scripts/i3_comp
-exec_always --no-startup-id ~/.config/i3/scripts/set-res
-exec --no-startup-id nitrogen --restore &
 
-set $rofi rofi -theme ~/.config/rofi/theme.rasi
-bindsym $mod+d exec $rofi -show drun
+bindsym $mod+d exec --no-startup-id rofi -show drun
 bindsym $mod+e exec thunar
 bindsym $mod+c exec firefox
-bindsym $mod+p exec CM_LAUNCHER="rofi -theme $HOME/.config/rofi/theme.rasi" clipmenu
-bindsym $mod+Page_Up exec ~/.config/i3/scripts/set-bright up
-bindsym $mod+Page_Down exec ~/.config/i3/scripts/set-bright down
+bindsym $mod+p exec --no-startup-id CM_LAUNCHER=rofi clipmenu
+bindsym $mod+Return exec alacritty
+bindsym $mod+Shift+Return exec alacritty --class alacritty-float,alacritty-float
+bindsym $mod+Shift+Escape exec alacritty --class alacritty-float,alacritty-float -e btop
 
-font pango:JetBrainsMono Nerd Font 13
+bindsym $mod+Page_Up exec --no-startup-id ~/.config/polybar/scripts/brightness.sh up
+bindsym $mod+Page_Down exec --no-startup-id ~/.config/polybar/scripts/brightness.sh down
+bindsym XF86MonBrightnessUp exec --no-startup-id ~/.config/polybar/scripts/brightness.sh up
+bindsym XF86MonBrightnessDown exec --no-startup-id ~/.config/polybar/scripts/brightness.sh down
 
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+bindsym Print exec --no-startup-id flameshot gui
+bindsym $mod+Shift+p exec --no-startup-id flameshot gui
+bindsym Shift+Print exec --no-startup-id flameshot full --clipboard --path ~/Pictures/Screenshots
+
+bindsym $mod+Shift+z exec --no-startup-id ~/.config/polybar/scripts/pomo.sh toggle
+bindsym $mod+Shift+x exec --no-startup-id loginctl lock-session
+bindsym $mod+Shift+e exec --no-startup-id ~/.config/i3/scripts/powermenu
+
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioStop exec --no-startup-id playerctl stop
 
 floating_modifier $mod
 
 tiling_drag modifier titlebar
-
-bindsym $mod+Return exec alacritty
 
 bindsym $mod+Shift+q kill
 
@@ -107,7 +120,6 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 mode "resize" {
         bindsym j resize shrink width 10 px or 10 ppt

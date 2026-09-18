@@ -1,0 +1,13 @@
+[Unit]
+Description=i3 session
+Documentation=man:systemd.special(7)
+BindsTo=graphical-session.target
+Wants=graphical-session-pre.target
+After=graphical-session-pre.target
+
+# Session daemons. To drop one: systemctl --user mask <unit>
+Wants=picom.service polkit-agent.service xss-lock.service clipmenud.service
+Wants=autotiling.service flameshot.service dunst.service
+
+# ~/.config/autostart and /etc/xdg/autostart (nm-applet etc.), replaces dex
+Wants=xdg-desktop-autostart.target
