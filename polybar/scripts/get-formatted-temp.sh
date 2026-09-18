@@ -66,6 +66,6 @@ fi
 
 # Output the final formatted string for Polybar
 # It contains ONLY the colored text, no icon.
-echo "%{F$color}$(printf "%-3s" "$temp")°C%{F-}"
+echo "%{F$color}${temp}°C%{F-}"
 
 exit 0

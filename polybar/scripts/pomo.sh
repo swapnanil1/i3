@@ -3,6 +3,7 @@
 STATE_FILE="/tmp/polybar_pomo_state"
 END_TIME_FILE="/tmp/polybar_pomo_end_time"
 PAUSED_TIME_FILE="/tmp/polybar_pomo_paused_time"
+LOOP_PID_FILE="/tmp/polybar_pomo_loop_pid"
 POMO_DURATION_MIN=25
 BREAK_DURATION_MIN=5
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -17,7 +18,7 @@ ICON_PAUSED=""
 ICON_BREAK="󰗊"
 ICON_STOPPED=""
 
-get_state() { cat "$STATE_FILE" 2>/dev/null || echo "stopped"; }
+get_state() { if [[ -s $STATE_FILE ]]; then echo "$(<"$STATE_FILE")"; else echo "stopped"; fi; }
 set_state() { echo "$1" > "$STATE_FILE"; }
 format_time() { local s=$1; ((s<0)) && s=0; printf "%02d:%02d" $((s/60)) $((s%60)); }
 play_sound() {
@@ -32,12 +33,12 @@ play_sound() {
 send_notification() { notify-send "$1" "$2" -i "$3" -u "$4" -t 5000; }
 
 action_start_pomo() {
-    echo $(( $(date +%s) + POMO_DURATION_MIN * 60 )) > "$END_TIME_FILE"
+    echo $(( $EPOCHSECONDS + POMO_DURATION_MIN * 60 )) > "$END_TIME_FILE"
     rm -f "$PAUSED_TIME_FILE"
     set_state "running"
 }
 action_start_break() {
-    echo $(( $(date +%s) + BREAK_DURATION_MIN * 60 )) > "$END_TIME_FILE"
+    echo $(( $EPOCHSECONDS + BREAK_DURATION_MIN * 60 )) > "$END_TIME_FILE"
     rm -f "$PAUSED_TIME_FILE"
     set_state "break_running"
 }
@@ -48,26 +49,26 @@ action_stop() {
 
 action_toggle_pause() {
     local state=$(get_state)
-    local current_time=$(date +%s)
+    local current_time=$EPOCHSECONDS
     
     case "$state" in
         running)
-            local end_time=$(cat "$END_TIME_FILE")
+            local end_time=$(<"$END_TIME_FILE")
             echo $((end_time - current_time)) > "$PAUSED_TIME_FILE"
             set_state "paused"
             ;;
         paused)
-            local remaining=$(cat "$PAUSED_TIME_FILE")
+            local remaining=$(<"$PAUSED_TIME_FILE")
             echo $((current_time + remaining)) > "$END_TIME_FILE"
             set_state "running"
             ;;
         break_running)
-            local end_time=$(cat "$END_TIME_FILE")
+            local end_time=$(<"$END_TIME_FILE")
             echo $((end_time - current_time)) > "$PAUSED_TIME_FILE"
             set_state "break_paused"
             ;;
         break_paused)
-            local remaining=$(cat "$PAUSED_TIME_FILE")
+            local remaining=$(<"$PAUSED_TIME_FILE")
             echo $((current_time + remaining)) > "$END_TIME_FILE"
             set_state "break_running"
             ;;
@@ -76,7 +77,7 @@ action_toggle_pause() {
 
 action_display() {
     local state=$(get_state)
-    local current_time=$(date +%s)
+    local current_time=$EPOCHSECONDS
     local icon_font="%{T1}"
     local text_font="%{T-}"
     local color=""
@@ -85,7 +86,7 @@ action_display() {
 
     case "$state" in
         running)
-            local end_time=$(cat "$END_TIME_FILE"); local remaining=$((end_time - current_time))
+            local end_time=$(<"$END_TIME_FILE"); local remaining=$((end_time - current_time))
             if (( remaining <= 0 )); then
                 send_notification "Pomodoro Finished!" "Time for a ${BREAK_DURATION_MIN} min break." "clock-symbolic" "critical"
                 play_sound; action_start_break;
@@ -93,10 +94,10 @@ action_display() {
                 color="$COLOR_RUNNING"; icon="$ICON_RUNNING"; text="$(format_time "$remaining")"
             fi;;
         paused)
-            local remaining=$(cat "$PAUSED_TIME_FILE")
+            local remaining=$(<"$PAUSED_TIME_FILE")
             color="$COLOR_PAUSED"; icon="$ICON_PAUSED"; text="$(format_time "$remaining")";;
         break_running)
-            local end_time=$(cat "$END_TIME_FILE"); local remaining=$((end_time - current_time))
+            local end_time=$(<"$END_TIME_FILE"); local remaining=$((end_time - current_time))
             if (( remaining <= 0 )); then
                 send_notification "Break Over!" "Time for a ${POMO_DURATION_MIN} min work session." "appointment-soon-symbolic" "normal"
                 play_sound; action_start_pomo;
@@ -104,7 +105,7 @@ action_display() {
                 color="$COLOR_BREAK"; icon="$ICON_BREAK"; text="$(format_time "$remaining")"
             fi;;
         break_paused)
-            local remaining=$(cat "$PAUSED_TIME_FILE")
+            local remaining=$(<"$PAUSED_TIME_FILE")
             color="$COLOR_PAUSED"; icon="$ICON_BREAK"; text="$(format_time "$remaining")";;
         stopped|*)
             color="$COLOR_STOPPED"; icon="$ICON_STOPPED"; text=" Start";;
@@ -120,24 +121,18 @@ if [[ -n "$1" ]]; then
         toggle_pause) action_toggle_pause;;
         stop)       action_stop;;
     esac
-    action_display
+    # wake the bar loop so the change shows immediately
+    [[ -s $LOOP_PID_FILE ]] && kill -USR1 "$(<"$LOOP_PID_FILE")" 2>/dev/null
     exit 0
 fi
 
-# This loop is for the `tail` in the Polybar module.
-# It is separate from the IPC hook system.
+# Bar loop for the `tail = true` polybar module: one line per second, and
+# immediately when a click/keybind (handled above) sends SIGUSR1.
+echo $$ > "$LOOP_PID_FILE"
+trap 'rm -f "$LOOP_PID_FILE"' EXIT
+trap ':' USR1
 while true; do
     action_display
-    read -t 1 -r line || continue
-done &
-
-# This is the IPC handler that listens for clicks
-polybar-msg -p "$(pgrep -f "polybar.*main")" hook pomo 4
-while true; do
-    read -r line || break
-    case "$line" in
-        "hook:pomo:1") action_start_pomo ;;
-        "hook:pomo:2") action_stop ;;
-        "hook:pomo:3") action_toggle_pause ;;
-    esac
+    sleep 1 &
+    wait $!
 done
