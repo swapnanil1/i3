@@ -6,8 +6,8 @@ dbus-update-activation-environment --systemd \
 	DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE \
 	QT_QPA_PLATFORMTHEME GTK_THEME 2>/dev/null
 
-# First login: the colour files are generated, not shipped
-[ -f ~/.config/i3/theme.env ] || ~/.config/i3/scripts/theme --no-reload onedark
+# The colour files are generated, not shipped
+~/.config/i3/scripts/theme --ensure
 
 ~/.config/i3/scripts/idle on
 

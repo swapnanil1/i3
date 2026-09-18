@@ -5,6 +5,7 @@
 #   theme <name>               apply themes/palettes/<name>.conf
 #   theme --list
 #   theme --check              validate palettes and templates, write nothing
+#   theme --ensure             rewrite the generated files if any is missing
 #   theme --no-reload <name>   only write the files (used by install.sh)
 #
 #   themes/palettes/*.conf   one palette per file: KEY=#rrggbb
@@ -20,6 +21,18 @@ RELOAD=1
 [[ $1 == --no-reload ]] && { RELOAD=0; shift; }
 if [[ $1 == --list ]]; then
 	for f in "$ROOT"/themes/palettes/*.conf; do basename "$f" .conf; done
+	exit 0
+fi
+
+# --ensure: the generated files are not in git, so they can go missing (fresh
+# clone, git clean, a rebase). Rewrite them all if any target is absent.
+if [[ $1 == --ensure ]]; then
+	while IFS='|' read -r template target _; do
+		target=${target// /}
+		[[ -z ${template// /} || $template == \#* || -f $ROOT/$target ]] && continue
+		current=$(sed -n 's/^THEME=//p' "$ROOT/i3/theme.env" 2>/dev/null)
+		exec "$0" --no-reload "${current:-onedark}"
+	done <"$ROOT/themes/targets.conf"
 	exit 0
 fi
 

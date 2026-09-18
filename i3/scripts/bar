@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Launch the bar
 launch_bar() {
+	# polybar refuses to start without its generated colour file
+	~/.config/i3/scripts/theme --ensure
+
 	# Terminate already running bar instances
 	# timeout: polybar-msg blocks forever if the bar's IPC socket has wedged
 	timeout 2 polybar-msg cmd quit >/dev/null 2>&1 || pkill -x polybar
