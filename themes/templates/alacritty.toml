@@ -34,7 +34,8 @@ cyan =    '${CYAN}'
 white =   '${WHITE}'
 
 [colors.bright]
-black =   '${BLACK}'
+# dim text: must stay readable on the background, so not ${BLACK}
+black =   '${FG_DIM}'
 red =     '${RED}'
 green =   '${GREEN}'
 yellow =  '${YELLOW}'
