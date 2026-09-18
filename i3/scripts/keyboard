@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Swap left Alt and left Super, so that Mod (Super) is the key under the left
+# thumb and apps get their Alt on the key beside it. To keep the keys where
+# they are printed, change SWAP to 0 (Mod is then the Windows key).
+#
+# Runs at login and again whenever a keyboard is plugged in (device-watch):
+# a newly attached keyboard starts with the system's options, not these.
+SWAP=1
+
+# Keep whatever options the system already sets (e.g. terminate:ctrl_alt_bksp)
+# and only add or remove the swap.
+current=$(setxkbmap -query | sed -n 's/^options: *//p')
+kept=$(tr ',' '\n' <<<"$current" | grep -v '^altwin:swap_lalt_lwin$' | grep . | paste -sd,)
+((SWAP)) && kept="${kept:+$kept,}altwin:swap_lalt_lwin"
+
+setxkbmap -option                       # -option alone clears, then set the full list
+[[ -n $kept ]] && setxkbmap -option "$kept"
+exit 0

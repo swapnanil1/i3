@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Lock immediately. Normally logind tells xss-lock to run the locker; if
+# xss-lock is not running that request would silently do nothing, so lock
+# directly in that case.
+if systemctl --user is-active --quiet xss-lock.service; then
+	loginctl lock-session
+else
+	exec ~/.config/i3/scripts/lock
+fi

@@ -1,0 +1,5 @@
+[Desktop Entry]
+# The picom package autostarts itself; here it runs as picom.service instead.
+Type=Application
+Name=picom
+Hidden=true

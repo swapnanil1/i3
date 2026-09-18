@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Runs once per login from the i3 config.
+
+# Let systemd user units and D-Bus activated services see the X session
+dbus-update-activation-environment --systemd \
+	DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE \
+	QT_QPA_PLATFORMTHEME GTK_THEME 2>/dev/null
+
+# The colour files are generated, not shipped
+~/.config/i3/scripts/theme --ensure
+
+~/.config/i3/scripts/keyboard
+~/.config/i3/scripts/idle on
+
+mkdir -p ~/Pictures/Screenshots
+
+# Clear anything left over from a previous X session that died uncleanly
+systemctl --user stop i3-session.target 2>/dev/null
+systemctl --user reset-failed 2>/dev/null
+systemctl --user start i3-session.target
+
+# after the session target, so PipeWire is up
+(sleep 2; ~/.config/i3/scripts/sound login) &

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Locker for xss-lock. exec keeps the sleep-lock fd that xss-lock hands over.
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+BG=${BG:-#1e222a}
+exec i3lock --nofork --color "${BG#\#}" --show-failed-attempts "$@"
