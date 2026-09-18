@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Idle behaviour: xss-lock fires the locker when the X screensaver kicks in.
+#   idle on | off
+
+LOCK_AFTER=600   # seconds idle before the screen locks
+OFF_AFTER=900    # seconds idle before the monitor powers down
+
+case "$1" in
+	on)  xset s "$LOCK_AFTER" 0; xset +dpms; xset dpms 0 0 "$OFF_AFTER" ;;
+	off) xset s off; xset -dpms ;;
+	*)   echo "usage: ${0##*/} on|off" >&2; exit 2 ;;
+esac

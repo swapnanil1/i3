@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Show the focused window's class/instance, for writing rules in 02_rules.conf
+id=$(xprop -root _NET_ACTIVE_WINDOW | awk '{print $NF}')
+info=$(xprop -id "$id" WM_CLASS | sed 's/.*= //')
+notify-send "Window class" "instance, class:\n$info"

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# User-level game mode, nothing system-wide:
+#   - compositor off (no blur/shadows, no compositing latency)
+#   - notifications paused
+#   - idle lock off (a controller does not count as input)
+#   - i3 "game" mode: no i3 binding fires except the one that leaves it,
+#     so Alt combos reach the game
+#   gamemode on | off
+
+case "$1" in
+	on)
+		notify-send -t 4000 "Game mode on" "i3 keys are off. Super+1..0 switches workspace, Alt+Shift+G leaves."
+		sleep 0.3
+		systemctl --user stop picom.service
+		dunstctl set-paused true
+		~/.config/i3/scripts/idle off
+		i3-msg -q mode game
+		;;
+	off)
+		i3-msg -q mode default
+		~/.config/i3/scripts/idle on
+		dunstctl set-paused false
+		systemctl --user start picom.service
+		notify-send -t 2500 "Game mode off"
+		;;
+	*) echo "usage: ${0##*/} on|off" >&2; exit 2 ;;
+esac
