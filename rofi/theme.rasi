@@ -2,8 +2,13 @@
 
 /*****----- Configuration -----*****/
 configuration {
-	modi:                       "drun,run,filebrowser,window";
-    show-icons:                 false;
+	modi:                       "drun,window";
+    show-icons:                 true;
+    icon-theme:                 "Papirus-Dark";
+    matching:                   "fuzzy";
+    sort:                       true;
+    sorting-method:             "fzf";
+    drun-match-fields:          "name,generic,keywords,categories,exec";
     display-drun:               " Apps";
     display-run:                " Run";
     display-filebrowser:        " Files";
@@ -49,7 +54,7 @@ window {
     location:                    center;
     anchor:                      center;
     fullscreen:                  false;
-    width:                       650px;
+    width:                       520px;
     x-offset:                    0px;
     y-offset:                    0px;
 
@@ -151,8 +156,8 @@ case-indicator {
 /*****----- Listview -----*****/
 listview {
     enabled:                     true;
-    columns:                     2;
-    lines:                       8;
+    columns:                     1;
+    lines:                       10;
     cycle:                       true;
     dynamic:                     true;
     scrollbar:                   false;
@@ -181,9 +186,9 @@ scrollbar {
 /*****----- Elements -----*****/
 element {
     enabled:                     true;
-    spacing:                     0px;
+    spacing:                     12px;
     margin:                      0px;
-    padding:                     6px;
+    padding:                     6px 12px;
     border:                      0px solid;
     border-radius:               10px;
     border-color:                @border-colour;
