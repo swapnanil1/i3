@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Pomodoro break: takes over the screen until the break ends.
+#
+#   break-screen start    i3 "break" mode (every i3 key off), notifications paused,
+#                         a fullscreen window with the countdown
+#   break-screen --run    what runs inside that window
+#
+# The only way out early is the skip shortcut (Mod+Ctrl+Shift+B) bound in the i3 "break" mode
+# (config.d/03_apps.conf), which runs `pomo skip`. The window watches the
+# pomodoro state and closes as soon as the break is over or skipped.
+
+POMO=~/.config/polybar/scripts/pomo
+STATE_DIR="${XDG_RUNTIME_DIR:-$HOME/.cache}/pomo"
+
+TIPS=(
+	"Stand up. Walk away from the desk."
+	"Drink a glass of water."
+	"Look at something 20 feet away for 20 seconds."
+	"Roll your shoulders. Stretch your neck."
+	"Shake out your hands and wrists."
+	"Move ya body. Ten squats, go."
+	"Breathe in for four, out for six."
+	"Refill the water bottle."
+)
+
+in_break() { [[ $(cat "$STATE_DIR/state" 2>/dev/null) == break_running ]]; }
+
+if [[ $1 == start ]]; then
+	in_break || exit 0
+	i3-msg -q mode break
+	dunstctl set-paused true
+	# The terminal ignores input; restoring i3 happens here, in the parent, so it
+	# runs even if the window dies for any reason.
+	alacritty --class break-screen,break-screen -o 'font.size=30' -o 'window.opacity=1.0' \
+		-e "$0" --run >/dev/null 2>&1
+	i3-msg -q mode default
+	dunstctl set-paused false
+	exit 0
+fi
+
+[[ $1 == --run ]] || { echo "usage: ${0##*/} start" >&2; exit 2; }
+
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+trap '' INT TSTP QUIT HUP            # Ctrl+C, Ctrl+Z, Ctrl+\ do nothing
+stty -echo -icanon 2>/dev/null
+printf '\e[?25l'                     # hide the cursor
+tip=${TIPS[RANDOM % ${#TIPS[@]}]}
+
+center() { printf '%*s%s\n' $(((cols - ${#1}) / 2)) '' "$1"; }
+
+while in_break; do
+	end=$(cat "$STATE_DIR/end_time" 2>/dev/null); [[ $end =~ ^[0-9]+$ ]] || break
+	left=$((end - EPOCHSECONDS)); ((left < 0)) && left=0
+	cols=$(tput cols); rows=$(tput lines)
+	printf '\e[H\e[2J'
+	for ((i = 0; i < rows / 2 - 3; i++)); do echo; done
+	center "BREAK"
+	echo
+	center "$(printf '%02d:%02d' $((left / 60)) $((left % 60)))"
+	echo
+	center "$tip"
+	echo; echo
+	center "skip: Mod + Ctrl + Shift + B"
+	read -r -t 1 -n 1000 _ 2>/dev/null   # wait a second, swallow anything typed
+done
+printf '\e[?25h'
