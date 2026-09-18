@@ -14,6 +14,8 @@ flameshot
 playerctl
 alacritty
 btop
+gsimplecal
+xdotool
 
 # Monitor brightness over DDC/CI, CPU/GPU temperatures for the bar
 ddcutil
