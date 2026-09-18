@@ -288,9 +288,11 @@ if ((KRIPTON)); then
 	if compgen -G "$HOME/.local/share/icons/Colloid*" >/dev/null || compgen -G "$HOME/.icons/Colloid*" >/dev/null; then
 		info "ok      Colloid icons"
 	else
-		tmp="${TMPDIR:-/tmp}/colloid-$STAMP"
-		if run git clone --depth 1 https://github.com/vinceliuice/Colloid-icon-theme.git "$tmp"; then
-			run "$tmp/install.sh" -s default -t default || warn "Colloid install failed"
+		# mktemp: a predictable /tmp path could be pre-created by another local
+		# user, who would then control the install.sh that gets executed
+		tmp="$( ((DRY_RUN)) && echo /tmp/colloid-XXXXXX || mktemp -d)"
+		if run git clone --depth 1 https://github.com/vinceliuice/Colloid-icon-theme.git "$tmp/src"; then
+			run "$tmp/src/install.sh" -s default -t default || warn "Colloid install failed"
 		else
 			warn "Colloid clone failed"
 		fi
