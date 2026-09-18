@@ -11,7 +11,7 @@ case "$1" in
 	on)
 		~/.config/i3/scripts/sound gamemode-on
 		touch "${XDG_RUNTIME_DIR:-$HOME/.cache}/gamemode"
-		notify-send -a i3-quiet -t 4000 "Game mode on" "i3 keys are off. Super+1..0 switches workspace, Alt+Shift+G leaves."
+		notify-send -a i3-quiet -t 4000 "Game mode on" "Only Mod+1..0 (workspaces) and Mod+Shift+G (leave) still work."
 		sleep 0.3
 		systemctl --user stop picom.service
 		dunstctl set-paused true

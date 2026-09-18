@@ -1,7 +1,9 @@
 # i3 config. Everything else lives in config.d/, loaded in name order:
 #   01_theme  02_rules  03_apps  04_wm  05_workspaces
 
-set $mod Mod1
+# Mod is Super. scripts/keyboard swaps left Alt and left Super, so it is the key
+# under the left thumb; apps get their Alt on the key beside it.
+set $mod Mod4
 include ~/.config/i3/config.d/*.conf
 
 ##-- Startup -------------------------------

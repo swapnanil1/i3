@@ -5,7 +5,7 @@
 #                         a fullscreen window with the countdown
 #   break-screen --run    what runs inside that window
 #
-# The only way out early is the skip shortcut bound in the i3 "break" mode
+# The only way out early is the skip shortcut (Mod+Ctrl+Shift+B) bound in the i3 "break" mode
 # (config.d/03_apps.conf), which runs `pomo skip`. The window watches the
 # pomodoro state and closes as soon as the break is over or skipped.
 
@@ -60,7 +60,7 @@ while in_break; do
 	echo
 	center "$tip"
 	echo; echo
-	center "skip: Ctrl+Alt+Shift+B"
+	center "skip: Mod + Ctrl + Shift + B"
 	read -r -t 1 -n 1000 _ 2>/dev/null   # wait a second, swallow anything typed
 done
 printf '\e[?25h'

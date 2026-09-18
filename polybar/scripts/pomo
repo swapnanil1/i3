@@ -2,10 +2,10 @@
 # Pomodoro for polybar: 25 minutes of work, 5 minutes of break, repeating.
 #
 #   pomo                 bar loop (tail module): prints the countdown every second
-#   pomo toggle          start, or pause/resume           (left click, Alt+Shift+Z)
+#   pomo toggle          start, or pause/resume           (left click, Mod+Shift+Z)
 #   pomo stop            stop and reset                   (right click)
 #   pomo break           take a break right now           (middle click)
-#   pomo skip            end the break now                (Ctrl+Alt+Shift+B)
+#   pomo skip            end the break now                (Mod+Ctrl+Shift+B)
 #   pomo stats           the last 7 days, as a notification (scroll on the timer)
 #
 # A minute before a break a notification warns you; when the break starts,
