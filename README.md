@@ -36,27 +36,38 @@ edits made under `~/.config/i3`, `polybar`, … are edits to the repo.
 
 ## Keys
 
-`$mod` is **Alt**.
+Built for the left hand on a 60% keyboard: thumb on **Mod**, fingers on W A S D.
+Mod is Super; `i3/scripts/keyboard` swaps left Alt and left Super so Mod is the
+key under the thumb (set `SWAP=0` there to keep the keys as printed).
 
-| Function | Shortcut | Using |
-| --- | --- | --- |
-| App launcher | Alt+D | rofi |
-| Terminal / floating terminal | Alt+Return / Alt+Shift+Return | alacritty |
-| Browser | Alt+C | firefox |
-| File manager | Alt+E | thunar |
-| Clipboard history | Alt+P | clipmenu + rofi |
-| Screenshot (select, annotate) | Print or Alt+Shift+P | flameshot |
-| Screenshot (full screen to `~/Pictures/Screenshots`) | Shift+Print | flameshot |
-| Brightness up / down | Alt+PageUp / Alt+PageDown | ddcutil |
-| Toggle pomodoro | Alt+Shift+Z | polybar `pomo` script |
-| System monitor | Alt+Shift+Escape | btop |
-| Lock | Alt+Shift+X | i3lock |
-| Power menu | Alt+Shift+E | rofi |
-| Close window | Alt+Shift+Q | |
-| Reload config / restart i3 | Alt+Shift+C / Alt+Shift+R | |
+`Mod+Shift+Space` lists every binding with a description, searchable, and
+Enter runs the selected one. The list is read from the config: the `#:`
+comment above each `bindsym` is its description.
+
+| Keys | Action |
+| --- | --- |
+| Mod + W A S D (+ Shift) | Focus (move window) |
+| Mod + 1…5 (+ Shift) | Workspace: web, code, terminals, files, games (send window) |
+| Mod + Esc / Tab | Previous workspace / window switcher |
+| Mod + Space | App launcher |
+| Mod + T / Q / E / B | Terminal, drop-down terminal, files, browser |
+| Mod + V / C | Clipboard history / screenshot (capture) |
+| Mod + F (+ Shift) | Fullscreen (float) |
+| Mod + R / G | Resize mode / adjust mode, both driven by W A S D |
+| Mod + Z / X | Toggle split layout / tabbed |
+| Mod + Ctrl + W S / A D / X | Volume / brightness / mute, one step |
+| Mod + Shift + Q | Close window |
+| Mod + Shift + Z X E G T | Pomodoro, lock, power menu, game mode, theme |
+| Mod + Shift + C / R | Reload / restart i3 |
+
+Adjust mode (Mod+G, nothing held): W S volume, A D brightness, X mute,
+Q E previous/next track, Space play/pause, Z event sounds, Esc leaves.
+
+Workspaces 6…0, Return for a terminal, J K L ; for focus and the media and
+Print keys still work on a full-size keyboard.
 
 The bar's brightness module also reacts to the scroll wheel; the pomodoro
-module to left (start), middle (stop) and right (pause) click.
+module to left (start, pause), middle (break now) and right (stop) click.
 
 ## What is where
 
