@@ -36,53 +36,53 @@ y = 0
 
 [colors]
 [colors.primary]
-background = '#1a1b26'
-foreground = '#c0caf5'
+background = '#1e222a'
+foreground = '#c8ccd4'
 
 [colors.cursor]
-text = '#1a1b26'
-cursor = '#c0caf5'
+text = '#1e222a'
+cursor = '#c8ccd4'
 
 [colors.vi_mode_cursor]
-text = '#1a1b26'
-cursor = '#c0caf5'
+text = '#1e222a'
+cursor = '#c8ccd4'
 
 [colors.search]
-matches = { foreground = '#1a1b26', background = '#ff9e64' }
-focused_match = { foreground = '#1a1b26', background = '#7aa2f7' }
+matches = { foreground = '#1e222a', background = '#d19a66' }
+focused_match = { foreground = '#1e222a', background = '#61afef' }
 
 [colors.hints]
-start = { foreground = '#1a1b26', background = '#e0af68' }
-end = { foreground = '#1a1b26', background = '#a9b1d6' }
+start = { foreground = '#1e222a', background = '#e5c07b' }
+end = { foreground = '#1e222a', background = '#abb2bf' }
 
 [colors.selection]
-text = '#c0caf5'
-background = '#414868'
+text = '#c8ccd4'
+background = '#3e4451'
 
 [colors.normal]
-black =   '#15161e'
-red =     '#f7768e'
-green =   '#9ece6a'
-yellow =  '#e0af68'
-blue =    '#7aa2f7'
-magenta = '#bb9af7'
-cyan =    '#7dcfff'
-white =   '#a9b1d6'
+black =   '#1e222a'
+red =     '#e06c75'
+green =   '#98c379'
+yellow =  '#e5c07b'
+blue =    '#61afef'
+magenta = '#c678dd'
+cyan =    '#56b6c2'
+white =   '#abb2bf'
 
 [colors.bright]
-black =   '#414868'
-red =     '#f7768e'
-green =   '#9ece6a'
-yellow =  '#e0af68'
-blue =    '#7aa2f7'
-magenta = '#bb9af7'
-cyan =    '#7dcfff'
-white =   '#c0caf5'
+black =   '#545862'
+red =     '#e06c75'
+green =   '#98c379'
+yellow =  '#e5c07b'
+blue =    '#61afef'
+magenta = '#c678dd'
+cyan =    '#56b6c2'
+white =   '#c8ccd4'
 
 [bell]
 animation = "EaseOutExpo"
 duration = 200
-color = '#c0caf5'
+color = '#c8ccd4'
 command = { program = "paplay", args = ["/usr/share/sounds/freedesktop/stereo/dialog-error.oga"] }
 
 [selection]
