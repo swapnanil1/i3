@@ -9,10 +9,13 @@ BREAK_DURATION_MIN=5
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 SOUND_FILE_PATH="$SCRIPT_DIR/notify.mp3"
 
+# Palette written by ~/.config/i3/scripts/theme
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+
 COLOR_RUNNING="${GREEN:-#98c379}"
 COLOR_PAUSED="${YELLOW:-#e5c07b}"
 COLOR_BREAK="${BLUE:-#61afef}"
-COLOR_STOPPED="${ALTFOREGROUND:-#727c91}"
+COLOR_STOPPED="${FG_DIM:-#727c91}"
 ICON_RUNNING=""
 ICON_PAUSED=""
 ICON_BREAK="󰗊"

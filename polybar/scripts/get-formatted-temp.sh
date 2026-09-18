@@ -3,8 +3,11 @@
 # This script only outputs a colored temperature string.
 # The icon is handled by the Polybar module itself.
 
+# Palette written by ~/.config/i3/scripts/theme
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+
 # --- CONFIGURATION ---
-COLOR_NORMAL="${FOREGROUND:-#c8ccd4}"
+COLOR_NORMAL="${FG:-#c8ccd4}"
 COLOR_WARN="${YELLOW:-#e5c07b}"
 COLOR_CRIT="${RED:-#e06c75}"
 

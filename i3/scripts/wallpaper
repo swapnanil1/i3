@@ -4,8 +4,10 @@
 
 for img in ~/.config/i3/wallpaper.{png,jpg,jpeg,webp} ~/Pictures/wallpaper.{png,jpg,jpeg,webp}; do
 	if [[ -f $img ]]; then
-		exec feh --no-fehbg --bg-fill "$img"
+		feh --no-fehbg --bg-fill "$img"
+		exit
 	fi
 done
 
-exec xsetroot -solid '#1e222a'
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+exec xsetroot -solid "${BG:-#1e222a}"

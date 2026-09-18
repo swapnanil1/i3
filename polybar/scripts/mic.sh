@@ -3,8 +3,11 @@
 #   mic.sh            print state now and on every source change (tail module)
 #   mic.sh toggle     mute/unmute the default source
 
+# Palette written by ~/.config/i3/scripts/theme
+[ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
+
 COLOR_MUTED="${RED:-#e06c75}"
-COLOR_LIVE="${ALTFOREGROUND:-#727c91}"
+COLOR_LIVE="${FG_DIM:-#727c91}"
 ICON_LIVE=$''
 ICON_MUTED=$''
 
