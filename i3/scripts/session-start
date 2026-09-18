@@ -9,6 +9,7 @@ dbus-update-activation-environment --systemd \
 # The colour files are generated, not shipped
 ~/.config/i3/scripts/theme --ensure
 
+~/.config/i3/scripts/keyboard
 ~/.config/i3/scripts/idle on
 
 mkdir -p ~/Pictures/Screenshots

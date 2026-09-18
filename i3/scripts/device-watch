@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Sound when a USB device is plugged in or removed. Runs as a user service.
+# On USB plug and unplug: play a sound, and re-apply the keyboard options,
+# because a newly attached keyboard does not inherit them. Runs as a user service.
 udevadm monitor --udev --subsystem-match=usb 2>/dev/null |
 	while read -r _ _ action _ rest; do
 		[[ $rest == *"(usb)"* ]] || continue
 		case "$action" in
-			add)    ~/.config/i3/scripts/sound device-added ;;
+			add)    ~/.config/i3/scripts/sound device-added
+			        (sleep 1; ~/.config/i3/scripts/keyboard) & ;;
 			remove) ~/.config/i3/scripts/sound device-removed ;;
 		esac
 	done
