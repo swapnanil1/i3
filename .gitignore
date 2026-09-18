@@ -1,0 +1,8 @@
+# written by i3/scripts/theme
+i3/theme.env
+i3/config.d/00_colors.conf
+polybar/colors.ini
+rofi/shared/colors.rasi
+alacritty/colors.toml
+dunst/dunstrc.d/
+fastfetch/config.jsonc
