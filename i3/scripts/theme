@@ -4,6 +4,7 @@
 #   theme                      pick a palette in rofi
 #   theme <name>               apply themes/palettes/<name>.conf
 #   theme --list
+#   theme --check              validate palettes and templates, write nothing
 #   theme --no-reload <name>   only write the files (used by install.sh)
 #
 #   themes/palettes/*.conf   one palette per file: KEY=#rrggbb
@@ -20,6 +21,25 @@ RELOAD=1
 if [[ $1 == --list ]]; then
 	for f in "$ROOT"/themes/palettes/*.conf; do basename "$f" .conf; done
 	exit 0
+fi
+
+# --check: validate every palette and template without writing anything
+if [[ $1 == --check ]]; then
+	status=0
+	for f in "$ROOT"/themes/palettes/*.conf; do
+		for key in "${KEYS[@]}"; do
+			grep -qE "^$key=#[0-9a-fA-F]{6}$" "$f" || { echo "$f: $key missing or not #rrggbb"; status=1; }
+		done
+	done
+	known=$(printf '%s|' "${KEYS[@]}" THEME THEME_HEADER)
+	while IFS='|' read -r template target _; do
+		template=${template// /}
+		[[ -z $template || $template == \#* ]] && continue
+		[[ -f $ROOT/themes/templates/$template ]] || { echo "targets.conf: no template $template"; status=1; continue; }
+		grep -oE '\$\{[A-Z_]+\}' "$ROOT/themes/templates/$template" | sort -u | grep -vE "^\\$\{(${known%|})\}$" |
+			sed "s|^|templates/$template: unknown placeholder |" | grep . && status=1
+	done <"$ROOT/themes/targets.conf"
+	exit $status
 fi
 
 THEME=$1
