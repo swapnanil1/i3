@@ -39,6 +39,9 @@ xdg-desktop-portal-gtk
 xdg-user-dirs
 xdg-utils
 
+# envsubst, used by the theme switcher
+gettext
+
 # Login manager (xorg-xauth: ly cannot start an X session without it)
 ly
 xorg-xauth
