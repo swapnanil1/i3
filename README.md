@@ -25,7 +25,8 @@ units.
 | `--dry-run` | Print what would happen, touch nothing |
 | `--yes` | Pass `--noconfirm` to pacman |
 | `--optional` | Also install `packages/optional.txt` (gammastep, mousepad, catfish, mpv, CJK fonts, numlockx) |
-| `--no-themes` | Leave theming alone: no Kripton/Colloid clone, no gsettings changes |
+| `--no-themes` | Leave theming alone: no gsettings changes |
+| `--kripton` | Also clone the Kripton GTK theme and Colloid icons (not packaged for Arch) |
 | `--fish` | Make fish the login shell |
 | `--doctor` | Only run the health checks |
 
@@ -62,7 +63,8 @@ module to left (start), middle (stop) and right (pause) click.
 | Path | Purpose |
 | --- | --- |
 | `i3/` | i3 config, theme, window rules, session scripts |
-| `polybar/`, `picom/`, `rofi/`, `dunst/`, `alacritty/`, `fish/`, `Thunar/` | Symlinked into `~/.config` |
+| `polybar/`, `picom/`, `rofi/`, `dunst/`, `alacritty/`, `gsimplecal/` | Symlinked into `~/.config` |
+| `fish/`, `Thunar/` | Copied once into `~/.config`: these apps rewrite their own files |
 | `systemd/user/` | `i3-session.target` and the daemons it starts |
 | `xorg/` | Snippets installed to `/etc/X11/xorg.conf.d/` |
 | `seeds/` | Files copied once and then left to their tool (nwg-look, qt6ct, kvantum, portals) |
@@ -101,7 +103,7 @@ both values are at the top of `session-start`.
 
 ### Theming
 
-* GTK: run `nwg-look`. It writes `~/.config/gtk-3.0/settings.ini` and gsettings;
+* GTK: `adw-gtk3-dark` with `Papirus-Dark` icons, both from the repos. To change them run `nwg-look`. It writes `~/.config/gtk-3.0/settings.ini` and gsettings;
   new windows pick the change up. Do not run an XSETTINGS daemon (xsettingsd,
   xfsettingsd) next to it, it would override that file.
 * Qt: `qt6ct` with the Kvantum style (`QT_QPA_PLATFORMTHEME=qt6ct` is set in
