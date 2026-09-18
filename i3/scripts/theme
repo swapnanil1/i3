@@ -46,6 +46,7 @@ THEME=$1
 if [[ -z $THEME ]]; then
 	THEME=$("$0" --list | rofi -dmenu -i -p "Theme" -l 8) || exit 0
 fi
+[[ $THEME =~ ^[a-z0-9_-]+$ ]] || { echo "bad theme name: $THEME" >&2; exit 1; }
 palette="$ROOT/themes/palettes/$THEME.conf"
 [[ -f $palette ]] || { echo "no such theme: $THEME (see: ${0##*/} --list)" >&2; exit 1; }
 
