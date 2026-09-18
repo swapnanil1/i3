@@ -23,10 +23,10 @@ COLOR_RUNNING="${GREEN:-#98c379}"
 COLOR_PAUSED="${YELLOW:-#e5c07b}"
 COLOR_BREAK="${BLUE:-#61afef}"
 COLOR_STOPPED="${FG_DIM:-#727c91}"
-ICON_RUNNING=""
-ICON_PAUSED=""
-ICON_BREAK="󰗊"
-ICON_STOPPED=""
+ICON_RUNNING="󰔟"
+ICON_PAUSED="󰏤"
+ICON_BREAK="󰅶"
+ICON_STOPPED="󰔛"
 
 get_state() { if [[ -s $STATE_FILE ]]; then echo "$(<"$STATE_FILE")"; else echo "stopped"; fi; }
 set_state() { echo "$1" > "$STATE_FILE"; }
@@ -88,8 +88,6 @@ action_toggle_pause() {
 action_display() {
     local state=$(get_state)
     local current_time=$EPOCHSECONDS
-    local icon_font="%{T1}"
-    local text_font="%{T-}"
     local color=""
     local icon=""
     local text=""
@@ -118,10 +116,10 @@ action_display() {
             local remaining=$(read_int "$PAUSED_TIME_FILE")
             color="$COLOR_PAUSED"; icon="$ICON_BREAK"; text="$(format_time "$remaining")";;
         stopped|*)
-            color="$COLOR_STOPPED"; icon="$ICON_STOPPED"; text=" Start";;
+            color="$COLOR_STOPPED"; icon="$ICON_STOPPED"; text="Start";;
     esac
     
-    echo "%{F$color}${icon_font}$icon${text_font}$text%{F-}"
+    echo "%{F$color}$icon $text%{F-}"
 }
 
 if [[ -n "$1" ]]; then

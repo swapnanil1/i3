@@ -7,9 +7,9 @@
 [ -f ~/.config/i3/theme.env ] && . ~/.config/i3/theme.env
 
 COLOR_MUTED="${RED:-#e06c75}"
-COLOR_LIVE="${FG_DIM:-#727c91}"
-ICON_LIVE=$''
-ICON_MUTED=$''
+COLOR_LIVE="${WHITE:-#abb2bf}"
+ICON_LIVE=$'\U000f036c'
+ICON_MUTED=$'\U000f036d'
 
 show() {
 	if [[ $(pactl get-source-mute @DEFAULT_SOURCE@ 2>/dev/null) == *yes ]]; then
