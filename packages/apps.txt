@@ -26,5 +26,6 @@ firefox
 pavucontrol
 fish
 eza
+fastfetch
 neovim
 git

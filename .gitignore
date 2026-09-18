@@ -5,3 +5,4 @@ polybar/colors.ini
 rofi/shared/colors.rasi
 alacritty/colors.toml
 dunst/dunstrc.d/
+fastfetch/config.jsonc

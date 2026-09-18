@@ -1,0 +1,6 @@
+# Sourced by interactive bash shells (install.sh adds the hook to ~/.bashrc).
+# System summary once per terminal: not in nested shells, not in editor terminals.
+if [ -z "$FETCH_SHOWN" ] && [ -z "$TERM_PROGRAM" ] && command -v fastfetch >/dev/null; then
+	export FETCH_SHOWN=1
+	fastfetch
+fi

@@ -1,0 +1,28 @@
+// ${THEME_HEADER}
+{
+	"$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+	"logo": {
+		"type": "small",
+		"padding": { "top": 1, "left": 2, "right": 3 },
+		"color": { "1": "${ACCENT}", "2": "${BLUE}" }
+	},
+	"display": {
+		"separator": "  ",
+		"color": { "keys": "${ACCENT}", "title": "${BLUE}", "separator": "${FG_DIM}" }
+	},
+	"modules": [
+		"title",
+		{ "type": "os", "key": "os" },
+		{ "type": "kernel", "key": "kernel" },
+		{ "type": "wm", "key": "wm" },
+		{ "type": "shell", "key": "shell" },
+		{ "type": "terminal", "key": "term" },
+		{ "type": "cpu", "key": "cpu" },
+		{ "type": "gpu", "key": "gpu" },
+		{ "type": "memory", "key": "mem" },
+		{ "type": "uptime", "key": "up" },
+		{ "type": "custom", "key": "theme", "format": "${THEME}" },
+		"break",
+		{ "type": "colors", "symbol": "circle" }
+	]
+}
