@@ -1,0 +1,17 @@
+# Session environment, sourced from ~/.xprofile by the display manager
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-i3}"
+export XDG_SESSION_TYPE=x11
+export QT_QPA_PLATFORMTHEME=qt6ct
+
+# A non-UTF-8 locale (e.g. LANG=en_IN) breaks btop, Compose keys and dunst's
+# text handling. Prefer the UTF-8 variant of the same locale when it exists.
+case "$LANG" in
+	*.UTF-8 | *.utf8) ;;
+	*)
+		if locale -a 2>/dev/null | grep -qix "${LANG:-en_US}.utf8"; then
+			export LANG="${LANG:-en_US}.UTF-8"
+		else
+			export LANG=C.UTF-8
+		fi
+		;;
+esac

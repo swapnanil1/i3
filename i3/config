@@ -1,0 +1,19 @@
+# i3 config. Everything else lives in config.d/, loaded in name order:
+#   01_theme  02_rules  03_apps  04_wm  05_workspaces
+
+# Mod is Super. scripts/keyboard swaps left Alt and left Super, so it is the key
+# under the left thumb; apps get their Alt on the key beside it.
+set $mod Mod4
+include ~/.config/i3/config.d/*.conf
+
+##-- Startup -------------------------------
+
+# Imports the X environment into systemd and starts i3-session.target, which
+# owns the daemons (picom, polkit agent, xss-lock, clipmenud, autotiling,
+# flameshot, dunst) and XDG autostart. Runs once per login, not on restart.
+exec --no-startup-id ~/.config/i3/scripts/session-start
+
+# Idempotent, so safe to re-run on every restart
+exec_always --no-startup-id ~/.config/i3/scripts/display
+exec_always --no-startup-id ~/.config/i3/scripts/wallpaper
+exec_always --no-startup-id ~/.config/i3/scripts/bar
