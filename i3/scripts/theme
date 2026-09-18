@@ -89,4 +89,5 @@ done <"$ROOT/themes/targets.conf"
 for cmd in "${reloads[@]}"; do
 	eval "$cmd" >/dev/null 2>&1
 done
-notify-send -t 2500 "Theme" "$THEME"
+~/.config/i3/scripts/sound theme
+notify-send -a i3-quiet -t 2500 "Theme" "$THEME"

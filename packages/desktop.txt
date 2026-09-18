@@ -15,6 +15,10 @@ playerctl
 alacritty
 btop
 gsimplecal
+
+# Event sounds (plain .oga files, no dependencies)
+ocean-sound-theme
+sound-theme-freedesktop
 xdotool
 
 # Monitor brightness over DDC/CI, CPU/GPU temperatures for the bar

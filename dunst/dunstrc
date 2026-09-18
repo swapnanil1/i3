@@ -60,3 +60,8 @@ timeout = 5
 
 [urgency_critical]
 timeout = 0
+
+# Event sound per notification (i3/scripts/sound decides whether it is audible)
+[sound]
+summary = "*"
+script = ~/.config/i3/scripts/sound-dunst

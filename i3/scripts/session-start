@@ -17,3 +17,6 @@ mkdir -p ~/Pictures/Screenshots
 systemctl --user stop i3-session.target 2>/dev/null
 systemctl --user reset-failed 2>/dev/null
 systemctl --user start i3-session.target
+
+# after the session target, so PipeWire is up
+(sleep 2; ~/.config/i3/scripts/sound login) &

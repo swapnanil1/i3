@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Sound when a USB device is plugged in or removed. Runs as a user service.
+udevadm monitor --udev --subsystem-match=usb 2>/dev/null |
+	while read -r _ _ action _ rest; do
+		[[ $rest == *"(usb)"* ]] || continue
+		case "$action" in
+			add)    ~/.config/i3/scripts/sound device-added ;;
+			remove) ~/.config/i3/scripts/sound device-removed ;;
+		esac
+	done
