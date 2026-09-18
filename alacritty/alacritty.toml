@@ -1,3 +1,7 @@
+# Colours are imported from colors.toml, written by ~/.config/i3/scripts/theme
+[general]
+import = ["~/.config/alacritty/colors.toml"]
+
 [env]
 TERM = "alacritty"
 WINIT_X11_SCALE_FACTOR = "1.0"
@@ -34,55 +38,9 @@ y = 0
 x = 0
 y = 0
 
-[colors]
-[colors.primary]
-background = '#1e222a'
-foreground = '#c8ccd4'
-
-[colors.cursor]
-text = '#1e222a'
-cursor = '#c8ccd4'
-
-[colors.vi_mode_cursor]
-text = '#1e222a'
-cursor = '#c8ccd4'
-
-[colors.search]
-matches = { foreground = '#1e222a', background = '#d19a66' }
-focused_match = { foreground = '#1e222a', background = '#61afef' }
-
-[colors.hints]
-start = { foreground = '#1e222a', background = '#e5c07b' }
-end = { foreground = '#1e222a', background = '#abb2bf' }
-
-[colors.selection]
-text = '#c8ccd4'
-background = '#3e4451'
-
-[colors.normal]
-black =   '#1e222a'
-red =     '#e06c75'
-green =   '#98c379'
-yellow =  '#e5c07b'
-blue =    '#61afef'
-magenta = '#c678dd'
-cyan =    '#56b6c2'
-white =   '#abb2bf'
-
-[colors.bright]
-black =   '#545862'
-red =     '#e06c75'
-green =   '#98c379'
-yellow =  '#e5c07b'
-blue =    '#61afef'
-magenta = '#c678dd'
-cyan =    '#56b6c2'
-white =   '#c8ccd4'
-
 [bell]
 animation = "EaseOutExpo"
 duration = 200
-color = '#c8ccd4'
 command = { program = "paplay", args = ["/usr/share/sounds/freedesktop/stereo/dialog-error.oga"] }
 
 [selection]

@@ -50,20 +50,13 @@ mouse_right_click = close_all
 title = Dunst
 class = Dunst
 
+# Colours per urgency: dunstrc.d/colors.conf, written by ~/.config/i3/scripts/theme
+
 [urgency_low]
 timeout = 2
-background = "#1e222a"
-foreground = "#c8ccd4"
-frame_color = "#545862"
 
 [urgency_normal]
 timeout = 5
-background = "#1e222a"
-foreground = "#c8ccd4"
-frame_color = "#da6e89"
 
 [urgency_critical]
 timeout = 0
-background = "#1e222a"
-foreground = "#e06c75"
-frame_color = "#e06c75"
