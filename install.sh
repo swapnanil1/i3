@@ -185,7 +185,7 @@ run sudo pacman "${pacman_args[@]}" "${pkgs[@]}"
 # --- user configuration ----------------------------------------------------
 
 step "Config symlinks"
-for dir in i3 polybar picom rofi dunst alacritty gsimplecal; do
+for dir in i3 polybar picom rofi dunst alacritty gsimplecal fastfetch; do
 	link "$dir" "$CONFIG/$dir"
 done
 link autostart/picom.desktop "$CONFIG/autostart/picom.desktop"
@@ -245,6 +245,13 @@ if grep -qsF 'i3/xprofile' "$HOME/.xprofile"; then
 else
 	info "append  ~/.xprofile"
 	((DRY_RUN)) || printf '%s\n' "$xprofile_line" >>"$HOME/.xprofile"
+fi
+bashrc_line='[ -f "$HOME/.config/i3/shellrc" ] && . "$HOME/.config/i3/shellrc"'
+if grep -qsF 'i3/shellrc' "$HOME/.bashrc"; then
+	info "ok      ~/.bashrc"
+else
+	info "append  ~/.bashrc"
+	((DRY_RUN)) || printf '%s\n' "$bashrc_line" >>"$HOME/.bashrc"
 fi
 run xdg-user-dirs-update
 run mkdir -p "$HOME/Pictures/Screenshots"
