@@ -1,0 +1,6 @@
+// VS Code runtime arguments. Seeded by the i3 dotfiles installer.
+{
+	// i3 is not a desktop Electron recognises, so name the secret store
+	// explicitly: the keyring that ly unlocks at login.
+	"password-store": "gnome-libsecret"
+}
