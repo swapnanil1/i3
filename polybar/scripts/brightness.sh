@@ -3,9 +3,10 @@
 # polybar module. The value is cached so the bar never polls the I2C bus, and
 # rapid key/scroll events collapse into a single hardware write.
 #
-#   brightness.sh get | up | down | set <0-100>
+#   brightness.sh get | up | down | set <0-100> | menu | toggle
 
 STEP=5
+NIGHT=30   # "toggle" flips between this and whatever was set before
 DIR="${XDG_RUNTIME_DIR:-/tmp}/brightness"
 mkdir -p "$DIR"
 
@@ -32,7 +33,8 @@ current() {
 }
 
 refresh_bar() {
-	command -v polybar-msg >/dev/null && polybar-msg action "#brightness.hook.0" >/dev/null 2>&1
+	# never let a wedged bar block a brightness change
+	command -v polybar-msg >/dev/null && timeout 2 polybar-msg action "#brightness.hook.0" >/dev/null 2>&1
 }
 
 change() {
@@ -72,5 +74,18 @@ case "$1" in
 		;;
 	up | down) change "$1" ;;
 	set) [[ $2 =~ ^[0-9]+$ ]] && change "$2" ;;
-	*) echo "usage: ${0##*/} get|up|down|set <0-100>" >&2; exit 2 ;;
+	menu)
+		pick=$(printf '%s\n' 100 75 50 25 10 | rofi -dmenu -i -p "Brightness" -l 5)
+		[[ $pick =~ ^[0-9]+$ ]] && change "$pick"
+		;;
+	toggle)
+		cur=$(current)
+		if [[ $cur == "$NIGHT" ]]; then
+			change "$(cat "$DIR/day" 2>/dev/null || echo 100)"
+		else
+			echo "$cur" >"$DIR/day"
+			change "$NIGHT"
+		fi
+		;;
+	*) echo "usage: ${0##*/} get|up|down|set <0-100>|menu|toggle" >&2; exit 2 ;;
 esac
