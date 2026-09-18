@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Launch the bar
+launch_bar() {
+	# polybar refuses to start without its generated colour file
+	~/.config/i3/scripts/theme --ensure
+
+	# Terminate already running bar instances
+	# timeout: polybar-msg blocks forever if the bar's IPC socket has wedged
+	timeout 2 polybar-msg cmd quit >/dev/null 2>&1 || pkill -x polybar
+
+	# Wait until the processes have been shut down
+	for _ in {1..15}; do pgrep -u $UID -x polybar >/dev/null || break; sleep 0.2; done
+	pkill -9 -x polybar
+
+	# Launch the bar
+	for mon in $(polybar --list-monitors | cut -d":" -f1); do
+		MONITOR=$mon polybar -q main -c ~/.config/polybar/config.ini &
+	done
+
+	# The brightness IPC module comes up empty until its hook fires once
+	# (`initial = 1` is not reliable), so fire it when the bar is ready.
+	(sleep 2; timeout 2 polybar-msg action "#brightness.hook.0" >/dev/null 2>&1) &
+}
+
+launch_bar
