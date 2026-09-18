@@ -1,0 +1,15 @@
+# .desktop ids hidden from the launcher (install.sh writes NoDisplay overrides
+# into ~/.local/share/applications). Remove the override file to show one again.
+avahi-discover
+bssh
+bvnc
+cmake-gui
+assistant
+designer
+linguist
+qdbusviewer
+qv4l2
+qvidcap
+lstopo
+thunar-bulk-rename
+nm-connection-editor

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Session menu: power actions first, then the things you restart while
+# tinkering. Opened by Mod+Shift+E and by right click on the bar's Arch logo.
+
+# "label|command", icons are Material Design glyphs from the Nerd Font
+entries=(
+	$'\U000f033e  Lock|~/.config/i3/scripts/lock-now'
+	$'\U000f0343  Logout|~/.config/i3/scripts/sound --wait logout; systemctl --user stop i3-session.target; i3-msg exit'
+	$'\U000f04b2  Suspend|systemctl suspend'
+	$'\U000f0709  Reboot|~/.config/i3/scripts/sound --wait logout; systemctl reboot'
+	$'\U000f0425  Shutdown|~/.config/i3/scripts/sound --wait logout; systemctl poweroff'
+	$'\U000f0450  Reload i3 config|i3-msg reload'
+	$'\U000f0453  Restart i3|i3-msg restart'
+	$'\U000f035c  Restart the bar|~/.config/i3/scripts/bar'
+	$'\U000f0328  Restart the compositor|systemctl --user restart picom.service'
+	$'\U000f009a  Restart notifications|systemctl --user restart dunst.service'
+	$'\U000f03d8  Theme picker|~/.config/i3/scripts/theme'
+	$'\U000f0297  Game mode|~/.config/i3/scripts/gamemode on'
+)
+
+choice=$(printf '%s\n' "${entries[@]%%|*}" | rofi -dmenu -i -p "Session" -l "${#entries[@]}")
+[[ -n $choice ]] || exit 0
+
+for entry in "${entries[@]}"; do
+	if [[ ${entry%%|*} == "$choice" ]]; then
+		setsid -f bash -c "${entry#*|}" >/dev/null 2>&1
+		exit 0
+	fi
+done

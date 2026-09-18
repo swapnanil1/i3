@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Focus an open window matching a class regex, otherwise run the command.
+#   focus-or-launch '<class regex>' <command...>
+#   focus-or-launch --browser        any browser window, else the default browser
+
+if [[ $1 == --browser ]]; then
+	desktop=$(xdg-settings get default-web-browser 2>/dev/null)
+	set -- '(?i)brave|firefox|chromium|librewolf|zen' gtk-launch "${desktop:-firefox.desktop}"
+fi
+
+class=$1; shift
+i3-msg "[class=\"$class\"] focus" 2>/dev/null | grep -q '"success":true' || exec "$@"

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Drop-down terminal on the scratchpad: started on first use, toggled after.
+
+if ! i3-msg -t get_tree | grep -q '"instance":"dropdown"'; then
+	alacritty --class dropdown,dropdown &
+	for _ in {1..50}; do
+		i3-msg -t get_tree | grep -q '"instance":"dropdown"' && break
+		sleep 0.1
+	done
+fi
+i3-msg -q '[instance="dropdown"] scratchpad show, move position center'

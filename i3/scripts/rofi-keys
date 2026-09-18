@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# rofi mode listing every i3 keybinding, read from the live config so it can
+# never drift from what is actually bound. The text shown is the "#:" comment
+# above each bindsym. Enter runs the selected binding.
+#
+#   rofi -show keys -modi "keys:~/.config/i3/scripts/rofi-keys"
+
+if [[ -n $ROFI_INFO ]]; then            # called again with the chosen entry
+	i3-msg -q "$ROFI_INFO" >/dev/null 2>&1
+	exit 0
+fi
+
+printf '\0prompt\x1fKeys\n'
+
+# Two passes over the same config: first what this setup adds (anything that
+# runs a program, or enters one of its modes), then i3's window management.
+list() {   # list custom|builtin
+	cat ~/.config/i3/config ~/.config/i3/config.d/*.conf | awk -v want="$1" '
+	/^##-- /        { gsub(/^##-- *| *-+ *$/, ""); section = $0; next }
+	/^mode "/       { mode = $2; gsub(/"/, "", mode); next }
+	/^}/            { mode = ""; next }
+	/^[ \t]*#: /    { desc = $0; sub(/^[ \t]*#: */, "", desc); next }
+	$1 == "bindsym" {
+		key = $2; cmd = $0
+		sub(/^[ \t]*bindsym[ \t]+[^ \t]+[ \t]+/, "", cmd)
+		kind = (cmd ~ /^exec / || cmd ~ /"(adjust|game)"/ || mode ~ /adjust|game|break/) ? "custom" : "builtin"
+		text = (desc != "") ? desc : cmd; desc = ""
+		if (kind != want) next
+		gsub(/\$mod/, "Mod", key); gsub(/Mod4/, "Mod", key); gsub(/Mod1/, "Alt", key)
+		if (mode != "") key = mode ": " key
+		gsub(/\$mod/, "Mod4", cmd)
+		line = sprintf("%-19s %s%c%s%c%s", key, text, 0, "info", 31, cmd)
+		if (mode != "") held[++n] = line; else print line     # everyday keys before mode-only ones
+	}
+	END { for (i = 1; i <= n; i++) print held[i] }'
+}
+header() { printf '%s\0nonselectable\x1ftrue\n' "$1"; }
+
+header "Mod = key under your left thumb. Enter runs the line."
+header "── this setup ──────────────────────"
+list custom
+header "── window management ───────────────"
+list builtin
