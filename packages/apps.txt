@@ -1,0 +1,31 @@
+# File manager and friends
+thunar
+thunar-volman
+thunar-archive-plugin
+tumbler
+ffmpegthumbnailer
+gvfs
+gvfs-mtp
+xarchiver
+unzip
+zip
+7zip
+ristretto
+xreader
+
+# Theming: GTK theme + icons from the repos, nwg-look to change them,
+# qt6ct + kvantum for Qt
+adw-gtk-theme
+papirus-icon-theme
+nwg-look
+qt6ct
+kvantum
+
+# Everyday
+firefox
+pavucontrol
+fish
+eza
+fastfetch
+neovim
+git

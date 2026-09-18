@@ -1,0 +1,26 @@
+# The i3 session itself.
+i3-wm
+i3lock
+xss-lock
+autotiling
+polybar
+picom
+rofi
+dunst
+libnotify
+clipmenu
+feh
+flameshot
+playerctl
+alacritty
+btop
+gsimplecal
+
+# Event sounds (plain .oga files, no dependencies)
+ocean-sound-theme
+sound-theme-freedesktop
+xdotool
+
+# Monitor brightness over DDC/CI, CPU/GPU temperatures for the bar
+ddcutil
+lm_sensors

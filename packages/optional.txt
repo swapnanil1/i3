@@ -1,0 +1,6 @@
+# Installed only with: ./install.sh --optional
+gammastep
+mousepad
+catfish
+noto-fonts-cjk
+numlockx
