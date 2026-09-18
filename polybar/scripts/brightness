@@ -7,8 +7,9 @@
 
 STEP=5
 NIGHT=30   # "toggle" flips between this and whatever was set before
-DIR="${XDG_RUNTIME_DIR:-/tmp}/brightness"
-mkdir -p "$DIR"
+# per-user runtime dir (0700), never a shared /tmp path
+DIR="${XDG_RUNTIME_DIR:-$HOME/.cache}/brightness"
+mkdir -p "$DIR" && chmod 700 "$DIR"
 
 # The I2C bus number can change between boots; XDG_RUNTIME_DIR is per-boot.
 bus_args() {
@@ -16,7 +17,7 @@ bus_args() {
 		ddcutil detect --brief 2>/dev/null |
 			sed -n 's|.*I2C bus: */dev/i2c-\([0-9]\+\).*|\1|p' | head -n1 >"$DIR/bus"
 	fi
-	[[ -s $DIR/bus ]] && echo "--bus $(<"$DIR/bus")"
+	[[ $(<"$DIR/bus") =~ ^[0-9]+$ ]] && echo "--bus $(<"$DIR/bus")"
 }
 
 read_hw() {
@@ -60,6 +61,7 @@ change() {
 	flock 8
 	local target
 	target=$(<"$DIR/value")
+	[[ $target =~ ^[0-9]+$ ]] || return
 	if [[ $target != "$(cat "$DIR/applied" 2>/dev/null)" ]]; then
 		# shellcheck disable=SC2046
 		ddcutil $(bus_args) --noverify setvcp 10 "$target" >/dev/null 2>&1 &&
@@ -81,7 +83,9 @@ case "$1" in
 	toggle)
 		cur=$(current)
 		if [[ $cur == "$NIGHT" ]]; then
-			change "$(cat "$DIR/day" 2>/dev/null || echo 100)"
+			day=$(cat "$DIR/day" 2>/dev/null)
+			[[ $day =~ ^[0-9]+$ ]] || day=100
+			change "$day"
 		else
 			echo "$cur" >"$DIR/day"
 			change "$NIGHT"
