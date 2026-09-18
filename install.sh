@@ -2,7 +2,7 @@
 # Bootstrap an i3/X11 desktop on top of a bare Arch Linux (server) install.
 # Safe to re-run. Nothing is touched with --dry-run.
 #
-#   ./install.sh [--dry-run] [--yes] [--optional] [--no-themes] [--fish] [--doctor]
+#   ./install.sh [--dry-run] [--yes] [--optional] [--no-themes] [--kripton] [--fish] [--doctor]
 
 set -euo pipefail
 
@@ -10,13 +10,14 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 
-DRY_RUN=0 YES=0 OPTIONAL=0 THEMES=1 FISH=0 DOCTOR_ONLY=0
+DRY_RUN=0 YES=0 OPTIONAL=0 THEMES=1 KRIPTON=0 FISH=0 DOCTOR_ONLY=0
 for arg in "$@"; do
 	case "$arg" in
 		--dry-run)   DRY_RUN=1 ;;
 		--yes)       YES=1 ;;
 		--optional)  OPTIONAL=1 ;;
 		--no-themes) THEMES=0 ;;
+		--kripton)   KRIPTON=1 ;;
 		--fish)      FISH=1 ;;
 		--doctor)    DOCTOR_ONLY=1 ;;
 		-h | --help) sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -70,6 +71,20 @@ seed() {
 	run install -Dm644 "$src" "$dst"
 }
 
+# seeddir <repo dir> <destination dir>; like seed, for a whole directory. Used
+# for apps that rewrite their own config (Thunar, fish): a symlink would make
+# every such rewrite show up as a modification in this repo.
+seeddir() {
+	local src="$REPO/$1" dst="$2"
+	if [[ -L $dst ]]; then
+		info "unlink  $dst (was a symlink into the repo)"
+		run rm "$dst"
+	fi
+	info "seed    $dst (existing files are kept)"
+	run mkdir -p "$dst"
+	run cp -rn "$src/." "$dst/"
+}
+
 # sysfile <repo path> <destination>; root-owned file, replaced only if different
 sysfile() {
 	local src="$REPO/$1" dst="$2"
@@ -106,6 +121,7 @@ doctor() {
 	check "monitor answers over DDC/CI"           sh -c "ddcutil detect --brief 2>/dev/null | grep -q 'I2C bus'"
 	check "PipeWire PulseAudio server reachable"  sh -c "pactl info | grep -q PipeWire"
 	check "i3-session.target installed"           test -e "$CONFIG/systemd/user/i3-session.target"
+	check "login unlocks the keyring (PAM)"        sh -c "test -e /usr/lib/security/pam_gnome_keyring.so && grep -qs pam_gnome_keyring /etc/pam.d/ly"
 	check "polkit agent binary present"           test -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1
 	check "a login manager is enabled"            sh -c "systemctl is-enabled display-manager.service || systemctl is-enabled ly@tty2.service"
 	check "~/.xprofile loads the session env"     grep -q 'i3/xprofile' "$HOME/.xprofile"
@@ -169,7 +185,7 @@ run sudo pacman "${pacman_args[@]}" "${pkgs[@]}"
 # --- user configuration ----------------------------------------------------
 
 step "Config symlinks"
-for dir in i3 polybar picom rofi dunst alacritty fish Thunar; do
+for dir in i3 polybar picom rofi dunst alacritty gsimplecal; do
 	link "$dir" "$CONFIG/$dir"
 done
 link autostart/picom.desktop "$CONFIG/autostart/picom.desktop"
@@ -178,11 +194,42 @@ for unit in "$REPO"/systemd/user/*; do
 done
 
 step "Seed files (copied once, then owned by their tools)"
+seeddir Thunar "$CONFIG/Thunar"
+seeddir fish   "$CONFIG/fish"
 seed seeds/gtk-3.0/settings.ini               "$CONFIG/gtk-3.0/settings.ini"
 seed seeds/gtk-4.0/settings.ini               "$CONFIG/gtk-4.0/settings.ini"
 seed seeds/xdg-desktop-portal/portals.conf    "$CONFIG/xdg-desktop-portal/portals.conf"
 seed seeds/qt6ct/qt6ct.conf                   "$CONFIG/qt6ct/qt6ct.conf"
 seed seeds/Kvantum/kvantum.kvconfig           "$CONFIG/Kvantum/kvantum.kvconfig"
+seed seeds/flameshot/flameshot.ini            "$CONFIG/flameshot/flameshot.ini"
+seed seeds/icons-default/index.theme          "$HOME/.icons/default/index.theme"
+
+# Chromium-family browsers pick their password/cookie encryption backend from
+# XDG_CURRENT_DESKTOP and do not know "i3", so the choice can differ between
+# versions. Pin it to the keyring (unlocked at login by ly's PAM hooks): no
+# password prompts, and no "logged out of everything" after a backend switch.
+# Skipped where another Secret Service already holds the browser's keys.
+if ! pacman -Qq kwallet >/dev/null 2>&1; then
+	# browsers, then Electron: Arch's electron launcher (Vesktop and other
+	# system-electron apps), code-oss / VS Code, VSCodium
+	for flags in chromium-flags.conf brave-flags.conf chrome-flags.conf \
+		electron-flags.conf code-flags.conf codium-flags.conf; do
+		seed seeds/browser/flags.conf "$CONFIG/$flags"
+	done
+	# VS Code family also reads the store from argv.json
+	for dir in .vscode .vscode-oss; do
+		seed seeds/browser/argv.json "$HOME/$dir/argv.json"
+	done
+fi
+
+step "Launcher clean-up"
+while read -r app; do
+	[[ -z $app || $app == \#* ]] && continue
+	override="$HOME/.local/share/applications/$app.desktop"
+	[[ -e /usr/share/applications/$app.desktop && ! -e $override ]] || continue
+	info "hide    $app"
+	((DRY_RUN)) || { mkdir -p "$(dirname "$override")"; printf '[Desktop Entry]\nType=Application\nName=%s\nNoDisplay=true\n' "$app" >"$override"; }
+done <"$REPO/rofi/hidden-apps.txt"
 
 step "Session environment"
 xprofile_line='[ -f "$HOME/.config/i3/xprofile" ] && . "$HOME/.config/i3/xprofile"'
@@ -205,16 +252,24 @@ fi
 
 if ((THEMES)); then
 	step "GTK theme and icons"
+	# adw-gtk-theme and papirus-icon-theme come from the package list; the seeded
+	# settings.ini selects them for GTK3/4 apps on X11.
 	# GTK4/libadwaita apps, Firefox and Electron read dark mode through the portal,
 	# which reads gsettings. nwg-look keeps these in sync afterwards.
 	run gsettings set org.gnome.desktop.interface color-scheme prefer-dark || warn "gsettings failed (no session bus?); set the theme once with nwg-look after login"
-	run gsettings set org.gnome.desktop.interface gtk-theme Kripton || true
-	run gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark || true
+	run gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark || true
+	run gsettings set org.gnome.desktop.interface icon-theme Papirus-Dark || true
+	run gsettings set org.gnome.desktop.interface cursor-theme Adwaita || true
+fi
+
+# Not packaged for Arch, so cloned from GitHub; pick them afterwards in nwg-look
+if ((KRIPTON)); then
+	step "Kripton GTK theme and Colloid icons (optional)"
 	if [[ -d $HOME/.themes/Kripton ]]; then
 		info "ok      ~/.themes/Kripton"
 	else
 		run git clone --depth 1 https://github.com/EliverLara/Kripton "$HOME/.themes/Kripton" ||
-			warn "Kripton clone failed; GTK falls back to Adwaita"
+			warn "Kripton clone failed"
 	fi
 	if compgen -G "$HOME/.local/share/icons/Colloid*" >/dev/null || compgen -G "$HOME/.icons/Colloid*" >/dev/null; then
 		info "ok      Colloid icons"
@@ -223,7 +278,7 @@ if ((THEMES)); then
 		if run git clone --depth 1 https://github.com/vinceliuice/Colloid-icon-theme.git "$tmp"; then
 			run "$tmp/install.sh" -s default -t default || warn "Colloid install failed"
 		else
-			warn "Colloid clone failed; icons fall back to Adwaita"
+			warn "Colloid clone failed"
 		fi
 		run rm -rf "$tmp"
 	fi
