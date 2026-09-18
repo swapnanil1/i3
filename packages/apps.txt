@@ -13,7 +13,10 @@ zip
 ristretto
 xreader
 
-# Theming: nwg-look for GTK, qt6ct + kvantum for Qt
+# Theming: GTK theme + icons from the repos, nwg-look to change them,
+# qt6ct + kvantum for Qt
+adw-gtk-theme
+papirus-icon-theme
 nwg-look
 qt6ct
 kvantum
